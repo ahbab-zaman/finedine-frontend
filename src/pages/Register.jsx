@@ -1,27 +1,16 @@
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { registerSchema } from "../utils/validation";
 import { useAuthStore } from "../store/useAuthStore";
-
-const countryCodes = [
-  { code: "+1", name: "USA" },
-  { code: "+1", name: "Canada" }, // Shares +1 with USA
-  { code: "+44", name: "UK" },
-  { code: "+91", name: "India" },
-  { code: "+81", name: "Japan" },
-  { code: "+880", name: "Bangladesh" },
-  { code: "+61", name: "Australia" },
-  { code: "+49", name: "Germany" },
-  // Add more as needed
-];
+import React, { useEffect } from "react";
 
 const Register = () => {
-  const [step, setStep] = useState(1); // 1: Form, 2: OTP
-  const [phone, setPhone] = useState("");
-  const { sendOTP, verifyOTP, register, isLoading } = useAuthStore();
+  const navigate = useNavigate();
+  const { register: registerUser, isLoading, token, user } = useAuthStore();
+  const isAuthenticated = !!token && !!user;
   const {
-    register: formRegister,
+    register,
     handleSubmit,
     formState: { errors },
     reset,
@@ -29,55 +18,53 @@ const Register = () => {
     resolver: yupResolver(registerSchema),
   });
 
-  const onSubmitForm = async (data) => {
-    const fullPhone = data.countryCode + data.phoneNumber;
-    setPhone(fullPhone);
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
+  const onSubmit = async (data) => {
     try {
-      await sendOTP(fullPhone);
-      setStep(2);
+      // Phone is now full international number (e.g., +1234567890)
+      await registerUser(data);
+      navigate("/", { replace: true });
+      reset();
     } catch (err) {
-      alert(err.message);
+      alert(err.message || "Registration failed.");
     }
   };
 
-  const onSubmitOTP = async (data) => {
-    try {
-      const fullPhone = phone;
-      await verifyOTP(fullPhone, data.otp);
-      // After verification, register with full data (store form data in state if needed)
-      // For simplicity, assume form data is re-submitted; in prod, persist it
-      const formData = { ...data, phone: fullPhone }; // Adjust as needed
-      await register(formData);
-      alert("Registration successful!");
-      reset();
-    } catch (err) {
-      alert(err.message);
-    }
-  };
+  // Early return if authenticated (redundant with useEffect but prevents flash)
+  if (isAuthenticated) {
+    return null; // Or a loading spinner if preferred
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Register
+            Create your account
           </h2>
         </div>
-        {step === 1 ? (
-          <form
-            className="mt-8 space-y-6"
-            onSubmit={handleSubmit(onSubmitForm)}
-          >
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          <div className="space-y-4">
             <div>
               <label
                 htmlFor="name"
                 className="block text-sm font-medium text-gray-700"
               >
-                Name
+                Full name
               </label>
               <input
-                {...formRegister("name")}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                id="name"
+                type="text"
+                {...register("name")}
+                className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                  errors.name ? "border-red-500" : ""
+                }`}
+                placeholder="Enter your full name"
               />
               {errors.name && (
                 <p className="mt-1 text-sm text-red-600">
@@ -90,12 +77,16 @@ const Register = () => {
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700"
               >
-                Email
+                Email address
               </label>
               <input
+                id="email"
                 type="email"
-                {...formRegister("email")}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                {...register("email")}
+                className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                  errors.email ? "border-red-500" : ""
+                }`}
+                placeholder="Enter your email"
               />
               {errors.email && (
                 <p className="mt-1 text-sm text-red-600">
@@ -111,9 +102,13 @@ const Register = () => {
                 Password
               </label>
               <input
+                id="password"
                 type="password"
-                {...formRegister("password")}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                {...register("password")}
+                className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                  errors.password ? "border-red-500" : ""
+                }`}
+                placeholder="Enter your password"
               />
               {errors.password && (
                 <p className="mt-1 text-sm text-red-600">
@@ -121,92 +116,52 @@ const Register = () => {
                 </p>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label
-                  htmlFor="countryCode"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Country Code
-                </label>
-                <select
-                  {...formRegister("countryCode")}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                >
-                  <option value="">Select</option>
-                  {countryCodes.map((c, index) => (
-                    <option key={index} value={c.code}>
-                      {c.code} ({c.name})
-                    </option>
-                  ))}
-                </select>
-                {errors.countryCode && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.countryCode.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label
-                  htmlFor="phoneNumber"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Phone Number
-                </label>
-                <input
-                  {...formRegister("phoneNumber")}
-                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
-                {errors.phoneNumber && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.phoneNumber.message}
-                  </p>
-                )}
-              </div>
-            </div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-            >
-              {isLoading ? "Sending..." : "Send OTP"}
-            </button>
-          </form>
-        ) : (
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmitOTP)}>
             <div>
               <label
-                htmlFor="otp"
+                htmlFor="phone"
                 className="block text-sm font-medium text-gray-700"
               >
-                Enter OTP
+                Phone Number
               </label>
               <input
-                {...formRegister("otp")}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                id="phone"
+                type="tel"
+                {...register("phone")}
+                className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                  errors.phone ? "border-red-500" : ""
+                }`}
+                placeholder="Enter international phone (e.g., +1234567890)"
               />
-              {errors.otp && (
+              {errors.phone && (
                 <p className="mt-1 text-sm text-red-600">
-                  {errors.otp.message}
+                  {errors.phone.message}
                 </p>
               )}
             </div>
+          </div>
+
+          <div>
             <button
               type="submit"
               disabled={isLoading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
-              {isLoading ? "Verifying..." : "Verify & Register"}
+              {isLoading ? "Creating account..." : "Create account"}
             </button>
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="w-full text-sm text-indigo-600 hover:text-indigo-500"
+          </div>
+        </form>
+
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-600">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="font-medium text-indigo-600 hover:text-indigo-500"
             >
-              Back to Form
-            </button>
-          </form>
-        )}
+              Sign in here
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

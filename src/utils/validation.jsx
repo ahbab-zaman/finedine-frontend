@@ -10,15 +10,13 @@ export const registerSchema = yup.object({
     .string()
     .min(8, "Password must be at least 8 characters")
     .required("Password is required"),
-  countryCode: yup.string().required("Country code is required"),
-  phoneNumber: yup
+  phone: yup
     .string()
-    .matches(/^\d{7,15}$/, "Invalid phone number")
-    .required("Phone number is required"),
-  otp: yup
-    .string()
-    .length(6, "OTP must be 6 digits")
-    .required("OTP is required"),
+    .matches(
+      /^\+[1-9]\d{1,14}$/,
+      "Phone must be international format (e.g., +1234567890)"
+    )
+    .required("Phone is required"),
 });
 
 export const loginSchema = yup.object({

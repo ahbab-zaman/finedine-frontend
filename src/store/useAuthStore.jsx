@@ -3,52 +3,48 @@ import { create } from "zustand";
 export const useAuthStore = create((set, get) => ({
   user: null,
   token: localStorage.getItem("token"),
-  isLoading: false,
+  isLoading: true, // start loading until we verify auth
   setLoading: (loading) => set({ isLoading: loading }),
+
   setAuth: (user, token) => {
     localStorage.setItem("token", token);
     set({ user, token });
   },
+
   logout: () => {
     localStorage.removeItem("token");
     set({ user: null, token: null });
   },
-  // Actions
-  async sendOTP(phone) {
-    const { setLoading } = get();
-    setLoading(true);
+
+  async initializeAuth() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      set({ isLoading: false });
+      return;
+    }
+
     try {
-      const res = await fetch("http://localhost:5000/api/auth/send-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
+      const res = await fetch("http://localhost:5000/api/auth/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      const data = await res.json();
-      setLoading(false);
-      return data;
+      const result = await res.json();
+      if (result.success) {
+        set({ user: result.user, token });
+      } else {
+        localStorage.removeItem("token");
+        set({ user: null, token: null });
+      }
     } catch (err) {
-      setLoading(false);
-      throw err;
+      console.error("Auth restore failed:", err);
+      localStorage.removeItem("token");
+      set({ user: null, token: null });
+    } finally {
+      set({ isLoading: false });
     }
   },
-  async verifyOTP(phone, otp) {
-    const { setLoading, setAuth } = get();
-    setLoading(true);
-    try {
-      const res = await fetch("http://localhost:5000/api/auth/verify-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, otp }),
-      });
-      const data = await res.json();
-      setLoading(false);
-      if (data.success) setAuth(data.user, data.token);
-      return data;
-    } catch (err) {
-      setLoading(false);
-      throw err;
-    }
-  },
+
   async register(data) {
     const { setLoading, setAuth } = get();
     setLoading(true);
@@ -67,6 +63,7 @@ export const useAuthStore = create((set, get) => ({
       throw err;
     }
   },
+
   async login(email, password) {
     const { setLoading, setAuth } = get();
     setLoading(true);
@@ -85,4 +82,6 @@ export const useAuthStore = create((set, get) => ({
       throw err;
     }
   },
+
+  isAuthenticated: () => !!get().token && !!get().user,
 }));
