@@ -43,7 +43,7 @@ const MenuShow = () => {
           <button
             key={cat}
             onClick={() => handleCategoryClick(cat)}
-            className={`px-4 py-2 rounded-full border flex-shrink-0 ${
+            className={`px-4 py-2 rounded-full border ${
               selectedCategory === cat
                 ? "bg-red-500 text-white border-red-500"
                 : "bg-white text-gray-700"
