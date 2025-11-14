@@ -6,12 +6,6 @@ const ProtectedRoute = ({ children }) => {
   const { token, user, isLoading: authLoading } = useAuthStore();
   const isAuthenticated = !!token && !!user;
 
-  console.log("ProtectedRoute check:", {
-    token: token ? "present" : null,
-    user: user ? "present" : null,
-    isAuthenticated,
-    authLoading,
-  });
 
   if (authLoading) {
     return (

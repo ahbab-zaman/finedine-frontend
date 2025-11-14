@@ -4,6 +4,7 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import ProtectedRoute from "../utils/ProtectedRoute";
 import GuestRoute from "../utils/GuestRoute";
+import Home from "../layout/Home";
 
 const router = createBrowserRouter([
   {
@@ -13,6 +14,12 @@ const router = createBrowserRouter([
         <MainLayout />
       </ProtectedRoute>
     ),
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+    ],
   },
   {
     path: "/login",

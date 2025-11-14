@@ -24,11 +24,14 @@ export const useAuthStore = create((set, get) => ({
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/me`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       const result = await res.json();
       if (result.success) {
         set({ user: result.user, token });
@@ -49,11 +52,14 @@ export const useAuthStore = create((set, get) => ({
     const { setLoading, setAuth } = get();
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/register`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        }
+      );
       const result = await res.json();
       setLoading(false);
       if (result.success) setAuth(result.user, result.token);
@@ -68,11 +74,14 @@ export const useAuthStore = create((set, get) => ({
     const { setLoading, setAuth } = get();
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        }
+      );
       const result = await res.json();
       setLoading(false);
       if (result.success) setAuth(result.user, result.token);
