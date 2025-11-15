@@ -1,10 +1,20 @@
-// src/components/CategoryList.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
+import AddCategoryModal from "./AddCategoryModal";
 
 const CategoryList = ({ categories, selectedCategory, onSelectCategory }) => {
+  const [openAdd, setOpenAdd] = useState(false);
+
   return (
     <div className="bg-white rounded-lg shadow-md p-4 animate-slide-in-left">
-      <h3 className="text-lg font-semibold mb-4 text-gray-800">Categories</h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold text-gray-800">Categories</h3>
+        <button
+          onClick={() => setOpenAdd(true)}
+          className="text-blue-600 font-semibold hover:underline"
+        >
+          + Add
+        </button>
+      </div>
       <ul className="space-y-2">
         {categories.map((category) => (
           <li key={category._id}>
@@ -21,6 +31,8 @@ const CategoryList = ({ categories, selectedCategory, onSelectCategory }) => {
           </li>
         ))}
       </ul>
+
+      <AddCategoryModal open={openAdd} onClose={() => setOpenAdd(false)} />
     </div>
   );
 };

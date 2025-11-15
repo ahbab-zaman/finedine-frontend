@@ -1,8 +1,7 @@
-// src/pages/Cart.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
+import { Trash2, Plus, Minus, ShoppingBag, Heart } from "lucide-react";
 
 const Cart = () => {
   const [cart, setCart] = useState({ items: [] });
@@ -11,6 +10,7 @@ const Cart = () => {
   const { token } = useAuthStore();
   const isAuth = !!token;
 
+  // Fetch cart
   useEffect(() => {
     if (!isAuth) {
       navigate("/login");
@@ -28,10 +28,12 @@ const Cart = () => {
         const result = await res.json();
         if (result.success) {
           setCart(result.cart);
-          const calcTotal = result.cart.items.reduce((sum, item) => {
-            return sum + item.menuItem.price * item.quantity;
-          }, 0);
-          setTotal(calcTotal);
+          setTotal(
+            result.cart.items.reduce(
+              (sum, item) => sum + item.menuItem.price * item.quantity,
+              0
+            )
+          );
         }
       } catch (err) {
         console.error("Error fetching cart:", err);
@@ -41,6 +43,7 @@ const Cart = () => {
     fetchCart();
   }, [isAuth, token, navigate]);
 
+  // Update quantity
   const updateQuantity = async (cartItemId, newQty) => {
     if (newQty < 1) return;
     try {
@@ -58,16 +61,19 @@ const Cart = () => {
       const result = await res.json();
       if (result.success) {
         setCart(result.cart);
-        const calcTotal = result.cart.items.reduce((sum, item) => {
-          return sum + item.menuItem.price * item.quantity;
-        }, 0);
-        setTotal(calcTotal);
+        setTotal(
+          result.cart.items.reduce(
+            (sum, item) => sum + item.menuItem.price * item.quantity,
+            0
+          )
+        );
       }
     } catch (err) {
       console.error("Error updating quantity:", err);
     }
   };
 
+  // Remove item
   const removeItem = async (cartItemId) => {
     try {
       const res = await fetch(
@@ -80,16 +86,19 @@ const Cart = () => {
       const result = await res.json();
       if (result.success) {
         setCart(result.cart);
-        const calcTotal = result.cart.items.reduce((sum, item) => {
-          return sum + item.menuItem.price * item.quantity;
-        }, 0);
-        setTotal(calcTotal);
+        setTotal(
+          result.cart.items.reduce(
+            (sum, item) => sum + item.menuItem.price * item.quantity,
+            0
+          )
+        );
       }
     } catch (err) {
       console.error("Error removing item:", err);
     }
   };
 
+  // Clear cart
   const clearCart = async () => {
     if (!window.confirm("Clear entire cart?")) return;
     try {
@@ -102,7 +111,7 @@ const Cart = () => {
       );
       const result = await res.json();
       if (result.success) {
-        setCart(result.cart);
+        setCart({ items: [] });
         setTotal(0);
       }
     } catch (err) {
@@ -131,11 +140,11 @@ const Cart = () => {
               {cart.items.map((cartItem) => (
                 <div
                   key={cartItem._id}
-                  className="bg-white rounded-lg shadow-md p-4 flex items-center justify-between animate-slide-up"
+                  className="bg-white rounded-lg shadow-md p-4 flex items-center justify-between animate-slide-up relative"
                 >
                   <div className="flex items-center space-x-4">
                     <img
-                      src={`${import.meta.env.VITE_API_BASE_URL}/${
+                      src={`${import.meta.env.VITE_API_BASE_URL}/uploads/${
                         cartItem.menuItem.images[0] || ""
                       }`}
                       alt={cartItem.menuItem.item_name}
@@ -150,6 +159,7 @@ const Cart = () => {
                       </p>
                     </div>
                   </div>
+
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2">
                       <button
@@ -177,6 +187,13 @@ const Cart = () => {
                       className="p-2 text-red-500 hover:text-red-700 transition-colors"
                     >
                       <Trash2 size={20} />
+                    </button>
+                    {/* Heart toggle button */}
+                    <button
+                      onClick={() => removeItem(cartItem._id)}
+                      className="absolute top-2 right-2 p-2 bg-white rounded-full shadow hover:bg-gray-100"
+                    >
+                      <Heart size={20} className="fill-red-500 text-red-500" />
                     </button>
                   </div>
                 </div>

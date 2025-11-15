@@ -1,101 +1,98 @@
-// const Home = () => {
-//   return (
-//     <div className="pt-[70px]">
-//       <div className="container mx-auto py-6">
-//         <div>
-//           <h2 className="text-[20px] font-bold mb-2">Copy Of Sample Menu</h2>
-//           <p className="text-[16px] font-semibold mb-[5px]">Your happy place</p>
-//           <p className="text-[14px] font-light">
-//             20% VAT included to all prices
-//           </p>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Home;
-
-// src/layout/Home.jsx
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import CategoryList from "../components/CategoryList";
 import MenuItemList from "../components/MenuItemList";
-import { useAuthStore } from "../store/useAuthStore";
+import SingleMenuModal from "../components/SingleMenuModal";
 
 const Home = () => {
   const [categories, setCategories] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const { user, token } = useAuthStore();
-  const isAuth = !!token && !!user;
+  const [loading, setLoading] = useState(true);
+  const [viewOpen, setViewOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [cartItems, setCartItems] = useState({}); // Track items in cart
 
+  // Fetch all categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/category`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              ...(isAuth && { Authorization: `Bearer ${token}` }),
-            },
-          }
+          `${import.meta.env.VITE_API_BASE_URL}/api/category`
         );
         const result = await res.json();
         if (result.success) {
           setCategories(result.categories);
-          if (result.categories.length > 0) {
-            setSelectedCategory(result.categories[0]._id);
-          }
+          setSelectedCategory(result.categories[0]?._id || null);
         }
       } catch (err) {
         console.error("Error fetching categories:", err);
       }
     };
+    fetchCategories();
+  }, []);
 
-    const fetchMenuItems = async (catId = null) => {
+  // Fetch all menu items
+  useEffect(() => {
+    const fetchMenus = async () => {
+      setLoading(true);
       try {
-        const url = catId
-          ? `${import.meta.env.VITE_API_BASE_URL}/api/menus?category=${catId}`
-          : `${import.meta.env.VITE_API_BASE_URL}/api/menus`;
-        const res = await fetch(url, {
-          headers: {
-            "Content-Type": "application/json",
-            ...(isAuth && { Authorization: `Bearer ${token}` }),
-          },
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/menus`
+        );
         const result = await res.json();
         if (result.success) {
           setMenuItems(result.items || []);
         }
       } catch (err) {
-        console.error("Error fetching menu items:", err);
+        console.error("Error fetching menus:", err);
+      } finally {
+        setLoading(false);
       }
     };
+    fetchMenus();
+  }, []);
 
-    fetchCategories();
-    if (selectedCategory) {
-      fetchMenuItems(selectedCategory);
-    }
-  }, [selectedCategory, isAuth, token]);
+  const handleCategorySelect = (catId) => setSelectedCategory(catId);
 
-  const handleCategorySelect = (catId) => {
-    setSelectedCategory(catId);
+  const handleViewDetails = (item) => {
+    setSelectedItem(item);
+    setViewOpen(true);
   };
+
+  const handleCloseModal = () => {
+    setViewOpen(false);
+    setSelectedItem(null);
+  };
+
+  const toggleCart = (id, item) => {
+    setCartItems((prev) => {
+      const updated = { ...prev };
+      if (updated[id]) delete updated[id];
+      else updated[id] = item;
+      return updated;
+    });
+  };
+
+  // Filter menus by selected category
+  const filteredMenus = selectedCategory
+    ? menuItems.filter((item) => item.category?._id === selectedCategory)
+    : menuItems;
+
+  if (loading) {
+    return (
+      <div className="pt-[70px] flex justify-center items-center h-64">
+        <div className="text-xl">Loading menu...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-[70px] bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
       <div className="container mx-auto py-6 px-4">
         <div className="mb-8 animate-fade-in">
-          <h2 className="text-2xl font-bold mb-2 text-gray-800">
-            Copy Of Sample Menu
-          </h2>
+          <h2 className="text-2xl font-bold mb-2 text-gray-800">Menu</h2>
           <p className="text-lg font-semibold mb-2 text-gray-600">
-            Your happy place
-          </p>
-          <p className="text-sm text-gray-500">
-            20% VAT included to all prices
+            Explore by categories
           </p>
         </div>
 
@@ -111,20 +108,27 @@ const Home = () => {
 
           {/* Menu Items */}
           <div className="lg:w-3/4">
-            <MenuItemList menuItems={menuItems} />
+            {filteredMenus.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                No menu items available in this category.
+              </div>
+            ) : (
+              <MenuItemList
+                menuItems={filteredMenus}
+                onViewDetails={handleViewDetails}
+              />
+            )}
           </div>
         </div>
 
-        {isAuth && user && (
-          <div className="mt-8 animate-slide-up">
-            <Link
-              to="/cart"
-              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
-            >
-              View Cart ({menuItems.filter((item) => item.inCart).length} items)
-            </Link>
-          </div>
-        )}
+        {/* Details Modal */}
+        <SingleMenuModal
+          open={viewOpen}
+          onClose={handleCloseModal}
+          item={selectedItem}
+          inCart={selectedItem && !!cartItems[selectedItem._id]}
+          toggleCart={toggleCart}
+        />
       </div>
     </div>
   );
