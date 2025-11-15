@@ -5,6 +5,10 @@ import Register from "../pages/Register";
 import ProtectedRoute from "../utils/ProtectedRoute";
 import GuestRoute from "../utils/GuestRoute";
 import Home from "../layout/Home";
+import MenuDetail from "../pages/MenuDetail";
+import Cart from "../pages/Cart";
+import CreateMenuItem from "../pages/CreateMenuItem";
+import MyMenu from "../pages/MyMenu";
 
 const router = createBrowserRouter([
   {
@@ -18,6 +22,22 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Home />,
+      },
+      {
+        path: "menu/:id",
+        element: <MenuDetail />,
+      },
+      {
+        path: "cart",
+        element: <Cart />,
+      },
+      {
+        path: "create-menu",
+        element: <CreateMenuItem />,
+      },
+      {
+        path: "my-menu",
+        element: <MyMenu />,
       },
     ],
   },

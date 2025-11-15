@@ -24,14 +24,11 @@ export const useAuthStore = create((set, get) => ({
     }
 
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/auth/me`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const result = await res.json();
       if (result.success) {
         set({ user: result.user, token });
@@ -62,8 +59,12 @@ export const useAuthStore = create((set, get) => ({
       );
       const result = await res.json();
       setLoading(false);
-      if (result.success) setAuth(result.user, result.token);
-      return result;
+      if (result.success) {
+        setAuth(result.user, result.token);
+        return result;
+      } else {
+        throw new Error(result.message || "Registration failed");
+      }
     } catch (err) {
       setLoading(false);
       throw err;
@@ -83,11 +84,17 @@ export const useAuthStore = create((set, get) => ({
         }
       );
       const result = await res.json();
+      console.log("Backend login response:", result); // Add logging here for debugging
       setLoading(false);
-      if (result.success) setAuth(result.user, result.token);
-      return result;
+      if (result.success) {
+        setAuth(result.user, result.token);
+        return result;
+      } else {
+        throw new Error(result.message || "Invalid email or password");
+      }
     } catch (err) {
       setLoading(false);
+      console.error("Login fetch error:", err); // Log network/fetch errors
       throw err;
     }
   },

@@ -1,3 +1,4 @@
+// src/index.js (Updated to use your Zustand store correctly - no Context needed)
 import React, { useEffect } from "react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
