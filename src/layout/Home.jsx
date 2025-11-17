@@ -87,8 +87,8 @@ const Home = () => {
   }
 
   return (
-    <div className="pt-[70px] bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
-      <div className="container mx-auto py-6 px-4">
+    <div className="pt-7 bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+      <div className="w-11/12 mx-auto py-6">
         <div className="mb-8 animate-fade-in">
           <h2 className="text-2xl font-bold mb-2 text-gray-800">Menu</h2>
           <p className="text-lg font-semibold mb-2 text-gray-600">
@@ -96,9 +96,9 @@ const Home = () => {
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col gap-8">
           {/* Categories Sidebar */}
-          <div className="lg:w-1/4">
+          <div>
             <CategoryList
               categories={categories}
               selectedCategory={selectedCategory}
@@ -107,7 +107,7 @@ const Home = () => {
           </div>
 
           {/* Menu Items */}
-          <div className="lg:w-3/4">
+          <div>
             {filteredMenus.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
                 No menu items available in this category.
@@ -120,15 +120,7 @@ const Home = () => {
             )}
           </div>
         </div>
-
-        {/* Details Modal */}
-        <SingleMenuModal
-          open={viewOpen}
-          onClose={handleCloseModal}
-          item={selectedItem}
-          inCart={selectedItem && !!cartItems[selectedItem._id]}
-          toggleCart={toggleCart}
-        />
+        
       </div>
     </div>
   );
