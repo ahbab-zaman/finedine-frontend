@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
   Menu,
   X,
@@ -10,11 +10,12 @@ import {
   ShoppingBag,
   Plus,
   Edit3,
+  Star,
 } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import logo from "../assets/fine-dine-logo.png";
 
-const Navbar = () => {
+const Navbar = ({ hidden = false }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const { user, logout, token } = useAuthStore();
@@ -58,66 +59,72 @@ const Navbar = () => {
   return (
     <div className="relative py-4">
       {/* Navbar */}
-      <nav className="bg-white/95 backdrop-blur-md border-b border-gray-200/50 px-4 py-3 flex items-center justify-between fixed top-0 left-0 w-full z-50 h-[70px] shadow-lg transition-all duration-300">
-        <div className="flex items-center space-x-3">
-          <Link to="/" className="flex-shrink-0">
-            <img
-              src={logo}
-              alt="Logo"
-              className="h-10 w-10 rounded-full shadow-md hover:scale-105 transition-transform duration-300"
-            />
-          </Link>
-        </div>
-
-        <div className="flex-1 px-4">
-          <h2 className="text-center text-xl font-semibold text-gray-800">
-            Fine Dine Menu
-          </h2>
-        </div>
-
-        {/* Right side */}
-        <div className="flex items-center space-x-4">
-          {isAuth && (
-            <Link
-              to="/cart"
-              className="relative p-2 text-gray-600 hover:text-blue-600 transition-colors duration-300 hover:scale-110"
-              title="Cart"
-            >
-              <ShoppingCart size={20} />
-              {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                  {cartCount}
-                </span>
-              )}
-            </Link>
-          )}
-          <div
-            className="flex items-center space-x-2 cursor-pointer p-2 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-105"
-            onClick={isAuth ? handleLogout : handleLoginClick}
-          >
-            {isAuth ? (
-              <LogOut size={20} className="text-red-500" />
-            ) : (
-              <User size={20} />
-            )}
-            <span className="hidden sm:inline font-medium text-gray-700">
-              {isAuth ? `Hi, ${user.name || user.email}` : "Login"}
-            </span>
+      <nav
+        className={`bg-white/95 backdrop-blur-md border-b border-gray-200 py-3 fixed top-0 left-0 w-full z-50 h-[70px] transition-all duration-300 ${
+          hidden ? "-translate-y-full" : "translate-y-0"
+        }`}
+      >
+        <div className="w-11/12 mx-auto flex items-center justify-between px-4">
+          <div className="flex items-center space-x-3">
+            <NavLink to="/" className="flex-shrink-0">
+              <img
+                src={logo}
+                alt="Logo"
+                className="h-10 w-10 rounded-full shadow-md hover:scale-105 transition-transform duration-300"
+              />
+            </NavLink>
           </div>
 
-          <button
-            className="p-2 text-gray-600 hover:text-blue-600 focus:outline-none transition-all duration-300 hover:scale-110"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            aria-label="Toggle menu"
-          >
-            {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <div className="flex-1 px-4">
+            <h2 className="text-center text-xl font-semibold text-gray-800">
+              Fine Dine Menu
+            </h2>
+          </div>
+
+          {/* Right side */}
+          <div className="flex items-center space-x-4">
+            {isAuth && (
+              <NavLink
+                to="/cart"
+                className="relative p-2 text-gray-600 hover:text-blue-600 transition-colors duration-300 hover:scale-110"
+                title="Cart"
+              >
+                <ShoppingCart size={20} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                    {cartCount}
+                  </span>
+                )}
+              </NavLink>
+            )}
+            <div
+              className="flex items-center space-x-2 cursor-pointer p-2 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-105"
+              onClick={isAuth ? handleLogout : handleLoginClick}
+            >
+              {isAuth ? (
+                <LogOut size={20} className="text-red-500" />
+              ) : (
+                <User size={20} />
+              )}
+              <span className="hidden sm:inline font-medium text-gray-700">
+                {isAuth ? `Hi, ${user.name || user.email}` : "Login"}
+              </span>
+            </div>
+
+            <button
+              className="p-2 text-gray-600 hover:text-blue-600 focus:outline-none transition-all duration-300 hover:scale-110"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              aria-label="Toggle menu"
+            >
+              {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </nav>
 
       {/* Mobile Sidebar */}
       <div
-        className={`fixed inset-0 z-40 transform transition-transform duration-300 ease-in-out bg-black/50 backdrop-blur-sm ${
+        className={`fixed inset-0 z-60 transform transition-transform duration-300 ease-in-out bg-black/50 backdrop-blur-sm ${
           sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={() => setSidebarOpen(false)}
@@ -139,62 +146,93 @@ const Navbar = () => {
               </button>
             </div>
             <nav className="space-y-4">
-              <Link
+              <NavLink
                 to="/"
-                className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-all duration-300 group"
+                className={({ isActive }) =>
+                  `flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-all duration-300 group ${
+                    isActive ? "bg-blue-100 text-blue-600" : ""
+                  }`
+                }
                 onClick={() => setSidebarOpen(false)}
               >
-                <Home
-                  size={20}
-                  className="text-gray-600 group-hover:text-blue-600"
-                />
-                <span className="text-gray-700 font-medium">Home</span>
-              </Link>
+                {({ isActive }) => (
+                  <>
+                    <Home
+                      size={20}
+                      className={`${
+                        isActive
+                          ? "text-blue-600"
+                          : "text-gray-600 group-hover:text-blue-600"
+                      }`}
+                    />
+                    <span className="text-gray-700 font-medium group-hover:text-blue-600">
+                      Home
+                    </span>
+                  </>
+                )}
+              </NavLink>
               {isAuth && (
                 <>
-                  <Link
-                    to="/cart"
-                    className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-all duration-300 group"
-                    onClick={() => setSidebarOpen(false)}
-                  >
-                    <ShoppingBag
-                      size={20}
-                      className="text-gray-600 group-hover:text-blue-600"
-                    />
-                    <span className="text-gray-700 font-medium">
-                      Cart ({cartCount})
-                    </span>
-                  </Link>
-                  <Link
+                  <NavLink
                     to="/my-menu"
-                    className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-all duration-300 group"
+                    className={({ isActive }) =>
+                      `flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-all duration-300 group ${
+                        isActive ? "bg-blue-100 text-blue-600" : ""
+                      }`
+                    }
                     onClick={() => setSidebarOpen(false)}
                   >
-                    <Edit3
-                      size={20}
-                      className="text-gray-600 group-hover:text-blue-600"
-                    />
-                    <span className="text-gray-700 font-medium">My Menu</span>
-                  </Link>
-                  <Link
-                    to="/create-menu"
-                    className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-all duration-300 group"
+                    {({ isActive }) => (
+                      <>
+                        <Edit3
+                          size={20}
+                          className={`${
+                            isActive
+                              ? "text-blue-600"
+                              : "text-gray-600 group-hover:text-blue-600"
+                          }`}
+                        />
+                        <span className="text-gray-700 font-medium group-hover:text-blue-600">
+                          My Menu
+                        </span>
+                      </>
+                    )}
+                  </NavLink>
+                  <NavLink
+                    to="/add-review"
+                    className={({ isActive }) =>
+                      `flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-all duration-300 group ${
+                        isActive ? "bg-blue-100 text-blue-600" : ""
+                      }`
+                    }
                     onClick={() => setSidebarOpen(false)}
                   >
-                    <Plus
-                      size={20}
-                      className="text-gray-600 group-hover:text-blue-600"
-                    />
-                    <span className="text-gray-700 font-medium">
-                      Create Item
-                    </span>
-                  </Link>
+                    {({ isActive }) => (
+                      <>
+                        <Star
+                          size={20}
+                          className={`${
+                            isActive
+                              ? "text-blue-600"
+                              : "text-gray-600 group-hover:text-blue-600"
+                          }`}
+                        />
+                        <span className="text-gray-700 font-medium group-hover:text-blue-600">
+                          Add Review
+                        </span>
+                      </>
+                    )}
+                  </NavLink>
                 </>
               )}
               <div className="pt-4 border-t border-gray-200">
-                <Link
+                <NavLink
                   to={isAuth ? "#" : "/login"}
-                  className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-all duration-300 group"
+                  className={({ isActive }) =>
+                    `flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-all duration-300 group ${
+                      isActive ? "bg-blue-100 text-blue-600" : ""
+                    }`
+                  }
                   onClick={(e) => {
                     if (isAuth) {
                       e.preventDefault();
@@ -205,15 +243,30 @@ const Navbar = () => {
                     }
                   }}
                 >
-                  {isAuth ? (
-                    <LogOut size={20} className="text-red-500" />
-                  ) : (
-                    <User size={20} className="text-gray-600" />
+                  {({ isActive }) => (
+                    <>
+                      {isAuth ? (
+                        <LogOut size={20} className="text-red-500" />
+                      ) : (
+                        <User
+                          size={20}
+                          className={`${
+                            isActive
+                              ? "text-blue-600"
+                              : "text-gray-600 group-hover:text-blue-600"
+                          }`}
+                        />
+                      )}
+                      <span
+                        className={`font-medium group-hover:text-blue-600 ${
+                          isAuth ? "text-red-500" : "text-gray-700"
+                        }`}
+                      >
+                        {isAuth ? "Logout" : "Login"}
+                      </span>
+                    </>
                   )}
-                  <span className="text-gray-700 font-medium">
-                    {isAuth ? "Logout" : "Login"}
-                  </span>
-                </Link>
+                </NavLink>
               </div>
             </nav>
           </div>

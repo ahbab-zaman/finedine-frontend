@@ -111,11 +111,7 @@ const CategoryList = ({
   };
 
   return (
-    <div className="w-full animate-slide-in-left">
-      <div className="flex justify-between items-center mb-4 px-2">
-        <h3 className="text-xl font-semibold text-gray-800">Categories</h3>
-      </div>
-
+    <div className="w-11/12 mx-auto animate-slide-in-left">
       <div className="flex justify-between items-center mb-6">
         <div className="flex flex-wrap gap-3">
           {categories.map((category) => {
@@ -163,8 +159,6 @@ const CategoryList = ({
         onClose={() => setOpenAddCategory(false)}
         onCategoryAdded={refreshCategories} // 🚀 refresh after adding
       />
-
-      {/* MENU MODAL */}
       {/* MENU MODAL */}
       {openAddMenu && (
         <div
@@ -172,7 +166,7 @@ const CategoryList = ({
           onClick={() => setOpenAddMenu(false)}
         >
           <div
-            className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl p-6 relative overflow-y-auto max-h-[90vh] custom-scrollbar animate-scaleUp"
+            className="bg-white rounded-2xl w-11/12 mx-auto shadow-2xl p-6 relative overflow-y-auto max-h-[90vh] custom-scrollbar animate-scaleUp"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">

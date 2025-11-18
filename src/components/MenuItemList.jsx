@@ -157,7 +157,7 @@ const MenuItemList = ({ menuItems = [] }) => {
             return (
               <article
                 key={item._id}
-                className="group bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer border border-gray-200"
+                className="group bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer border border-gray-200 w-11/12 mx-auto"
                 onClick={() => openModal(item)}
               >
                 <div className="flex items-start p-4 sm:p-6 gap-4 sm:gap-6">
