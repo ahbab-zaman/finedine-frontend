@@ -53,9 +53,6 @@ const CategoryList = ({
     setImagePreviews([]);
   };
 
-  // ==========================
-  // ADD MENU
-  // ==========================
   const handleSubmitMenu = async (e) => {
     e.preventDefault();
 
@@ -111,42 +108,59 @@ const CategoryList = ({
   };
 
   return (
-    <div className="w-11/12 mx-auto animate-slide-in-left">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex flex-wrap gap-3">
-          {categories.map((category) => {
-            const isActive = selectedCategory === category._id;
-            return (
-              <button
-                key={category._id}
-                onClick={() => onSelectCategory(category._id)}
-                className={`flex items-center gap-2 px-5 py-2 rounded-lg border transition-all font-medium ${
-                  isActive
-                    ? "bg-[#e6034b] text-white"
-                    : "border-pink-500 text-pink-600 bg-white hover:bg-pink-50"
-                }`}
-              >
-                {category.name.toLowerCase() === "most liked" && (
-                  <FaHeart
-                    className={isActive ? "text-white" : "text-pink-500"}
-                  />
-                )}
+    <div className="w-11/12 mx-auto animate-slide-in-left md:sticky md:top-0 md:z-10">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 gap-2 md:gap-0">
+        <div className="w-full md:w-auto">
+          {/* Desktop: Horizontal Button Tabs */}
+          <div className="hidden md:flex flex-wrap gap-3">
+            {categories.map((category) => {
+              const isActive = selectedCategory === category._id;
+              return (
+                <button
+                  key={category._id}
+                  onClick={() => onSelectCategory(category._id)}
+                  className={`flex items-center gap-2 px-5 py-2 rounded-lg border transition-all font-medium ${
+                    isActive
+                      ? "bg-[#e6034b] text-white"
+                      : "border-pink-500 text-pink-600 bg-white hover:bg-pink-50"
+                  }`}
+                >
+                  {category.name.toLowerCase() === "most liked" && (
+                    <FaHeart
+                      className={isActive ? "text-white" : "text-pink-500"}
+                    />
+                  )}
+                  {category.name}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Mobile: Dropdown Select */}
+          <select
+            value={selectedCategory || ""}
+            onChange={(e) => onSelectCategory(e.target.value)}
+            className="md:hidden w-full px-5 py-2 rounded-lg border border-pink-500 text-pink-600 bg-white font-medium focus:outline-none focus:ring-2 focus:ring-[#e6034b] focus:border-transparent transition-all hover:bg-pink-50"
+          >
+            <option value="">Select Category</option>
+            {categories.map((category) => (
+              <option key={category._id} value={category._id}>
                 {category.name}
-              </button>
-            );
-          })}
+              </option>
+            ))}
+          </select>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
           <button
             onClick={() => setOpenAddCategory(true)}
-            className="text-white border border-pink-600 p-2 rounded-lg bg-[#e6034b]"
+            className="w-full md:w-auto text-white border border-pink-600 px-4 md:px-2 py-2 rounded-lg bg-[#e6034b] font-medium transition-all hover:bg-[#c30c46]"
           >
             + Add Category
           </button>
           <button
             onClick={() => setOpenAddMenu(true)}
-            className="text-white border border-pink-600 p-2 rounded-lg bg-[#e6034b]"
+            className="w-full md:w-auto text-white border border-pink-600 px-4 md:px-2 py-2 rounded-lg bg-[#e6034b] font-medium transition-all hover:bg-[#c30c46]"
           >
             + Add Menu
           </button>
@@ -162,7 +176,7 @@ const CategoryList = ({
       {/* MENU MODAL */}
       {openAddMenu && (
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-70 animate-fadeIn"
           onClick={() => setOpenAddMenu(false)}
         >
           <div

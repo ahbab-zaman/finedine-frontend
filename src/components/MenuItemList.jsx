@@ -80,6 +80,8 @@ const MenuItemList = ({ menuItems = [] }) => {
           message: `${itemName} removed from cart`,
           type: "success",
         });
+        // Dispatch event to update cart count in Navbar
+        window.dispatchEvent(new CustomEvent("cartUpdated"));
       } else {
         // Add to cart
         const res = await fetch(
@@ -106,6 +108,9 @@ const MenuItemList = ({ menuItems = [] }) => {
           setTimeout(() => {
             setBouncingIds((prev) => prev.filter((id) => id !== menuId));
           }, 300);
+
+          // Dispatch event to update cart count in Navbar
+          window.dispatchEvent(new CustomEvent("cartUpdated"));
         } else {
           toast.push({
             message: result.message || "Failed to add to cart",
@@ -135,7 +140,7 @@ const MenuItemList = ({ menuItems = [] }) => {
   };
 
   return (
-    <div className="mx-auto py-6 px-4 max-w-7xl">
+    <div className="w-11/12 mx-auto py-6">
       {/* Single Menu Modal */}
       <SingleMenuModal
         open={modalOpen}
@@ -157,7 +162,7 @@ const MenuItemList = ({ menuItems = [] }) => {
             return (
               <article
                 key={item._id}
-                className="group bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer border border-gray-200 w-11/12 mx-auto"
+                className="group bg-white rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer border border-gray-200"
                 onClick={() => openModal(item)}
               >
                 <div className="flex items-start p-4 sm:p-6 gap-4 sm:gap-6">

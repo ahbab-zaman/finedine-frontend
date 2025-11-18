@@ -180,12 +180,12 @@ const Home = () => {
   return (
     <div
       className={`bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen transition-all duration-300 ${
-        isScrolled ? "pt-0" : "pt-[30px]"
+        isScrolled ? "md:pt-0" : ""
       }`}
     >
       <div className="mx-auto">
-        <div className="w-11/12 mx-auto animate-fade-in pb-4">
-          <h2 className="text-2xl font-bold -gray-800">Menu</h2>
+        <div className="w-11/12 mx-auto animate-fade-in pb-2">
+          <h2 className="text-2xl font-bold">Menu</h2>
           <p className="text-lg font-semibold text-gray-600">
             Explore by categories
           </p>
@@ -193,10 +193,10 @@ const Home = () => {
         <div className="flex flex-col gap-8 ">
           {/* Sticky Category Navigation */}
           <div
-            className={`sticky border-b border-gray-200 z-40 py-3 transition-all duration-300  ${
+            className={`border-b border-gray-200 py-3 transition-all duration-300 md:sticky md:z-30 md:border-b md:border-gray-200 md:py-3 ${
               isScrolled
-                ? "top-0 bg-white/95 backdrop-blur-md shadow-sm"
-                : "top-[70px]"
+                ? "md:top-0 bg-[#F6F9FC]"
+                : "md:top-[70px]"
             }`}
           >
             <CategoryList
@@ -226,8 +226,8 @@ const Home = () => {
                     data-category-id={category._id}
                     className={`${
                       isScrolled
-                        ? "scroll-mt-0 w-11/12"
-                        : "scroll-mt-[120px] w-11/12"
+                        ? "md:scroll-mt-0 scroll-mt-[70px] w-full"
+                        : "md:scroll-mt-[120px] scroll-mt-[70px] w-full"
                     } first:scroll-mt-[70px]`} // Adjust offset dynamically
                   >
                     <div className="pt-4 mb-4 w-11/12 mx-auto">
@@ -260,8 +260,8 @@ const Home = () => {
                       id={`cat-${selectedCategory}`}
                       className={`${
                         isScrolled
-                          ? "scroll-mt-0 w-11/12"
-                          : "scroll-mt-[120px] w-11/12"
+                          ? "md:scroll-mt-0 scroll-mt-[70px] w-11/12"
+                          : "md:scroll-mt-[120px] scroll-mt-[70px] w-11/12"
                       }`}
                     >
                       <div className="p-6 mb-4 w-11/12">
