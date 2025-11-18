@@ -1,10 +1,17 @@
 import React, { useState } from "react";
 import { FaHeart } from "react-icons/fa";
-import AddCategoryModal from "./AddCategoryModal";
 import { Upload, Save } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
+import AddCategoryModal from "./AddCategoryModal";
+import { useToast } from "./ToastProvider";
 
-const CategoryList = ({ categories, selectedCategory, onSelectCategory }) => {
+const CategoryList = ({
+  categories = [],
+  selectedCategory,
+  onSelectCategory,
+  refreshCategories,
+  refreshMenus,
+}) => {
   const [openAddCategory, setOpenAddCategory] = useState(false);
   const [openAddMenu, setOpenAddMenu] = useState(false);
   const [menuForm, setMenuForm] = useState({
@@ -18,26 +25,52 @@ const CategoryList = ({ categories, selectedCategory, onSelectCategory }) => {
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const { token } = useAuthStore();
+  const toast = useToast();
 
   const handleInputChange = (e) => {
-    setMenuForm({ ...menuForm, [e.target.name]: e.target.value });
+    setMenuForm((s) => ({ ...s, [e.target.name]: e.target.value }));
   };
 
   const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
+    const files = Array.from(e.target.files).slice(0, 5);
     setImages(files);
     const previews = files.map((file) => URL.createObjectURL(file));
     setImagePreviews(previews);
   };
 
+  const resetForm = () => {
+    setMenuForm({
+      category: "",
+      item_name: "",
+      short_description: "",
+      price: "",
+      calories: "",
+      ingredients: "",
+    });
+    setImages([]);
+    setImagePreviews([]);
+  };
+
+  // ==========================
+  // ADD MENU
+  // ==========================
   const handleSubmitMenu = async (e) => {
     e.preventDefault();
+
+    if (!token) {
+      toast.push({ message: "Please login first", type: "error" });
+      return;
+    }
+
     setLoading(true);
     const data = new FormData();
+
     Object.keys(menuForm).forEach((key) => {
       if (menuForm[key]) data.append(key, menuForm[key]);
     });
+
     images.forEach((img) => data.append("images", img));
 
     try {
@@ -49,26 +82,29 @@ const CategoryList = ({ categories, selectedCategory, onSelectCategory }) => {
           body: data,
         }
       );
+
       const result = await res.json();
+
       if (result.success) {
-        alert("Menu item created!");
-        setMenuForm({
-          category: "",
-          item_name: "",
-          short_description: "",
-          price: "",
-          calories: "",
-          ingredients: "",
+        toast.push({
+          message: "Menu item created successfully",
+          type: "success",
         });
-        setImages([]);
-        setImagePreviews([]);
+
+        resetForm();
         setOpenAddMenu(false);
+
+        // 🚀 Refresh menus instantly
+        refreshMenus && refreshMenus();
       } else {
-        alert(result.message);
+        toast.push({
+          message: result.message || "Failed to create menu item",
+          type: "error",
+        });
       }
     } catch (err) {
       console.error(err);
-      alert("Failed to create menu item");
+      toast.push({ message: "Failed to create menu", type: "error" });
     } finally {
       setLoading(false);
     }
@@ -76,12 +112,10 @@ const CategoryList = ({ categories, selectedCategory, onSelectCategory }) => {
 
   return (
     <div className="w-full animate-slide-in-left">
-      {/* Header */}
       <div className="flex justify-between items-center mb-4 px-2">
         <h3 className="text-xl font-semibold text-gray-800">Categories</h3>
       </div>
 
-      {/* Category Buttons */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex flex-wrap gap-3">
           {categories.map((category) => {
@@ -110,32 +144,35 @@ const CategoryList = ({ categories, selectedCategory, onSelectCategory }) => {
         <div className="flex gap-2">
           <button
             onClick={() => setOpenAddCategory(true)}
-            className="text-white border border-pink-600 p-2 rounded-lg bg-[#e6034b] transition-colors duration-500 font-semibold hover:text-pink-600 hover:bg-white"
+            className="text-white border border-pink-600 p-2 rounded-lg bg-[#e6034b]"
           >
             + Add Category
           </button>
           <button
             onClick={() => setOpenAddMenu(true)}
-            className="text-white border border-pink-600 p-2 rounded-lg bg-[#e6034b] transition-colors duration-500 font-semibold hover:text-pink-600 hover:bg-white"
+            className="text-white border border-pink-600 p-2 rounded-lg bg-[#e6034b]"
           >
             + Add Menu
           </button>
         </div>
       </div>
 
+      {/* CATEGORY MODAL */}
       <AddCategoryModal
         open={openAddCategory}
         onClose={() => setOpenAddCategory(false)}
+        onCategoryAdded={refreshCategories} // 🚀 refresh after adding
       />
 
-      {/* Add Menu Modal */}
+      {/* MENU MODAL */}
+      {/* MENU MODAL */}
       {openAddMenu && (
         <div
           className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn"
           onClick={() => setOpenAddMenu(false)}
         >
           <div
-            className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl p-6 animate-scaleUp relative overflow-y-auto max-h-[90vh] custom-scrollbar"
+            className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl p-6 relative overflow-y-auto max-h-[90vh] custom-scrollbar animate-scaleUp"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
@@ -143,54 +180,61 @@ const CategoryList = ({ categories, selectedCategory, onSelectCategory }) => {
             </h2>
 
             <form className="space-y-5" onSubmit={handleSubmitMenu}>
-              <div>
-                <label className="block text-gray-700 font-medium mb-1">
-                  Category
-                </label>
-                <select
-                  name="category"
-                  value={menuForm.category}
-                  onChange={handleInputChange}
-                  className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
-                  required
-                >
-                  <option value="">Select Category</option>
-                  {categories.map((cat) => (
-                    <option key={cat._id} value={cat._id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-gray-700 font-medium mb-1">
-                  Item Name
-                </label>
-                <input
-                  type="text"
-                  name="item_name"
-                  value={menuForm.item_name}
-                  onChange={handleInputChange}
-                  className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
-                  required
-                />
-              </div>
-
+              {/* Category & Item Name */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-gray-700 font-medium mb-1">
-                    Price ($)
+                    Category <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="category"
+                    value={menuForm.category}
+                    onChange={handleInputChange}
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-400 transition-all"
+                    required
+                  >
+                    <option value="">Select Category</option>
+                    {categories.map((cat) => (
+                      <option key={cat._id} value={cat._id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 font-medium mb-1">
+                    Item Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="item_name"
+                    value={menuForm.item_name}
+                    onChange={handleInputChange}
+                    placeholder="Item Name"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-400 transition-all"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Price & Calories */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-gray-700 font-medium mb-1">
+                    Price ($) <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="number"
                     name="price"
                     value={menuForm.price}
                     onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+                    placeholder="Price"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-400 transition-all"
                     required
                   />
                 </div>
+
                 <div>
                   <label className="block text-gray-700 font-medium mb-1">
                     Calories
@@ -200,12 +244,13 @@ const CategoryList = ({ categories, selectedCategory, onSelectCategory }) => {
                     name="calories"
                     value={menuForm.calories}
                     onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
-                    required
+                    placeholder="Calories"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-400 transition-all"
                   />
                 </div>
               </div>
 
+              {/* Description */}
               <div>
                 <label className="block text-gray-700 font-medium mb-1">
                   Short Description
@@ -214,11 +259,13 @@ const CategoryList = ({ categories, selectedCategory, onSelectCategory }) => {
                   name="short_description"
                   value={menuForm.short_description}
                   onChange={handleInputChange}
-                  className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all resize-none"
+                  placeholder="Describe the menu item"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-400 transition-all resize-none"
                   rows={3}
                 />
               </div>
 
+              {/* Ingredients */}
               <div>
                 <label className="block text-gray-700 font-medium mb-1">
                   Ingredients (comma-separated)
@@ -228,15 +275,15 @@ const CategoryList = ({ categories, selectedCategory, onSelectCategory }) => {
                   name="ingredients"
                   value={menuForm.ingredients}
                   onChange={handleInputChange}
-                  className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
                   placeholder="e.g., tomato, cheese, basil"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-400 transition-all"
                 />
               </div>
 
+              {/* Image Upload */}
               <div>
-                <label className="block text-gray-700 font-medium mb-1 flex items-center">
-                  <Upload size={16} className="mr-2" />
-                  Images (up to 5)
+                <label className="block text-gray-700 font-medium mb-2">
+                  Upload Images (Max 5)
                 </label>
                 <input
                   type="file"
@@ -245,21 +292,27 @@ const CategoryList = ({ categories, selectedCategory, onSelectCategory }) => {
                   onChange={handleImageChange}
                   className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none"
                 />
+                {/* Preview Thumbnails */}
                 {imagePreviews.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-2">
+                  <div className="flex flex-wrap gap-2 mt-3">
                     {imagePreviews.map((src, i) => (
-                      <img
+                      <div
                         key={i}
-                        src={src}
-                        alt={`preview-${i}`}
-                        className="w-16 h-16 object-cover rounded-lg border border-gray-200 shadow-sm"
-                      />
+                        className="w-16 h-16 rounded-lg border border-gray-200 overflow-hidden shadow-sm"
+                      >
+                        <img
+                          src={src}
+                          alt={`preview-${i}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                     ))}
                   </div>
                 )}
               </div>
 
-              <div className="flex justify-end gap-3 mt-4">
+              {/* Buttons */}
+              <div className="flex justify-end gap-3 mt-6">
                 <button
                   type="button"
                   onClick={() => setOpenAddMenu(false)}
@@ -267,58 +320,37 @@ const CategoryList = ({ categories, selectedCategory, onSelectCategory }) => {
                 >
                   Cancel
                 </button>
+
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`px-5 py-2 rounded-xl bg-[#E6034B] text-white font-semibold hover:bg-[#c30c46] transition-all shadow-md flex items-center justify-center gap-2 ${
+                  className={`px-6 py-2 rounded-xl bg-[#E6034B] text-white font-semibold hover:bg-[#c30c46] transition-all shadow-md flex items-center gap-2 ${
                     loading ? "opacity-70 cursor-not-allowed" : ""
                   }`}
                 >
                   {loading && (
-                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   )}
-                  <Save size={16} />
                   Add Menu
                 </button>
               </div>
             </form>
-
-            <button
-              onClick={() => setOpenAddMenu(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
-              aria-label="Close modal"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-
-            <style>{`
-              @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-              @keyframes scaleUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-              .animate-fadeIn { animation: fadeIn 0.25s ease-out; }
-              .animate-scaleUp { animation: scaleUp 0.3s ease-out; }
-
-              /* Thin custom scrollbar */
-              .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-              .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-              .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.2); border-radius: 3px; }
-              .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: rgba(0,0,0,0.35); }
-            `}</style>
           </div>
         </div>
       )}
+
+      {/* ===== Add Animations Styles ===== */}
+      <style>{`
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes scaleUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .animate-fadeIn { animation: fadeIn 0.25s ease-out; }
+  .animate-scaleUp { animation: scaleUp 0.3s ease-out; }
+
+  .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.2); border-radius: 3px; }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: rgba(0,0,0,0.35); }
+`}</style>
     </div>
   );
 };

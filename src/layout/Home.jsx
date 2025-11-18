@@ -10,48 +10,56 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [viewOpen, setViewOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [cartItems, setCartItems] = useState({}); // Track items in cart
 
-  // Fetch all categories
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/category`
-        );
-        const result = await res.json();
-        if (result.success) {
-          setCategories(result.categories);
-          setSelectedCategory(result.categories[0]?._id || null);
+  // ==========================
+  // FETCH CATEGORIES
+  // ==========================
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/category`
+      );
+      const result = await res.json();
+
+      if (result.success) {
+        setCategories(result.categories);
+
+        // auto-select first category if none selected
+        if (!selectedCategory && result.categories.length > 0) {
+          setSelectedCategory(result.categories[0]._id);
         }
-      } catch (err) {
-        console.error("Error fetching categories:", err);
       }
-    };
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+    }
+  };
+
+  // ==========================
+  // FETCH MENU ITEMS
+  // ==========================
+  const fetchMenus = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/menus`);
+      const result = await res.json();
+
+      if (result.success) {
+        setMenuItems(result.items);
+      }
+    } catch (err) {
+      console.error("Error fetching menus:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load data on mount
+  useEffect(() => {
     fetchCategories();
-  }, []);
-
-  // Fetch all menu items
-  useEffect(() => {
-    const fetchMenus = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/menus`
-        );
-        const result = await res.json();
-        if (result.success) {
-          setMenuItems(result.items || []);
-        }
-      } catch (err) {
-        console.error("Error fetching menus:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchMenus();
   }, []);
 
+  // Category select
   const handleCategorySelect = (catId) => setSelectedCategory(catId);
 
   const handleViewDetails = (item) => {
@@ -59,21 +67,6 @@ const Home = () => {
     setViewOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setViewOpen(false);
-    setSelectedItem(null);
-  };
-
-  const toggleCart = (id, item) => {
-    setCartItems((prev) => {
-      const updated = { ...prev };
-      if (updated[id]) delete updated[id];
-      else updated[id] = item;
-      return updated;
-    });
-  };
-
-  // Filter menus by selected category
   const filteredMenus = selectedCategory
     ? menuItems.filter((item) => item.category?._id === selectedCategory)
     : menuItems;
@@ -97,16 +90,14 @@ const Home = () => {
         </div>
 
         <div className="flex flex-col gap-8">
-          {/* Categories Sidebar */}
-          <div>
-            <CategoryList
-              categories={categories}
-              selectedCategory={selectedCategory}
-              onSelectCategory={handleCategorySelect}
-            />
-          </div>
+          <CategoryList
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onSelectCategory={handleCategorySelect}
+            refreshCategories={fetchCategories}
+            refreshMenus={fetchMenus}
+          />
 
-          {/* Menu Items */}
           <div>
             {filteredMenus.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
@@ -120,7 +111,6 @@ const Home = () => {
             )}
           </div>
         </div>
-        
       </div>
     </div>
   );

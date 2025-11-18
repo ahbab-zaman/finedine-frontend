@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import SingleMenuModal from "./SingleMenuModal";
+import { useToast } from "./ToastProvider";
 
 const MenuItemList = ({ menuItems = [] }) => {
   const [cartIds, setCartIds] = useState([]);
   const [adding, setAdding] = useState({});
-  const [notification, setNotification] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [bouncingIds, setBouncingIds] = useState([]); // For bounce effect
   const { token } = useAuthStore();
   const isAuth = !!token;
+  const toast = useToast();
 
   // Fetch cart items on mount
   useEffect(() => {
@@ -34,19 +35,18 @@ const MenuItemList = ({ menuItems = [] }) => {
         }
       } catch (err) {
         console.error("Failed to fetch cart:", err);
+        toast.push({ message: "Failed to load cart", type: "error" });
       }
     };
     fetchCart();
-  }, [token, isAuth]);
-
-  const showNotification = (message, type = "success") => {
-    setNotification({ message, type });
-    setTimeout(() => setNotification(null), 3000);
-  };
+  }, [token, isAuth, toast]);
 
   const toggleCart = async (menuId, itemName) => {
     if (!isAuth) {
-      showNotification("Please login to add items to cart", "error");
+      toast.push({
+        message: "Please login to add items to cart",
+        type: "error",
+      });
       return;
     }
 
@@ -75,8 +75,11 @@ const MenuItemList = ({ menuItems = [] }) => {
             }
           );
         }
-        setCartIds(cartIds.filter((id) => id !== menuId));
-        showNotification(`${itemName} removed from cart`, "success");
+        setCartIds((prev) => prev.filter((id) => id !== menuId));
+        toast.push({
+          message: `${itemName} removed from cart`,
+          type: "success",
+        });
       } else {
         // Add to cart
         const res = await fetch(
@@ -92,8 +95,11 @@ const MenuItemList = ({ menuItems = [] }) => {
         );
         const result = await res.json();
         if (result.success) {
-          setCartIds([...cartIds, menuId]);
-          showNotification(`${itemName} added to cart!`, "success");
+          setCartIds((prev) => [...prev, menuId]);
+          toast.push({
+            message: `${itemName} added to cart!`,
+            type: "success",
+          });
 
           // Trigger bounce animation
           setBouncingIds((prev) => [...prev, menuId]);
@@ -101,12 +107,18 @@ const MenuItemList = ({ menuItems = [] }) => {
             setBouncingIds((prev) => prev.filter((id) => id !== menuId));
           }, 300);
         } else {
-          showNotification(result.message || "Failed to add to cart", "error");
+          toast.push({
+            message: result.message || "Failed to add to cart",
+            type: "error",
+          });
         }
       }
     } catch (err) {
       console.error("Cart operation failed:", err);
-      showNotification("Failed to update cart. Please try again.", "error");
+      toast.push({
+        message: "Failed to update cart. Please try again.",
+        type: "error",
+      });
     } finally {
       setAdding((prev) => ({ ...prev, [menuId]: false }));
     }
@@ -124,22 +136,6 @@ const MenuItemList = ({ menuItems = [] }) => {
 
   return (
     <div className="mx-auto py-6 px-4 max-w-7xl">
-      {/* Notification Toast */}
-      {notification && (
-        <div
-          className={`fixed top-6 right-6 z-50 px-6 py-4 rounded-xl shadow-2xl animate-slideIn min-w-[280px] ${
-            notification.type === "success"
-              ? "bg-green-500 text-white"
-              : "bg-red-500 text-white"
-          }`}
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-            <span className="font-medium">{notification.message}</span>
-          </div>
-        </div>
-      )}
-
       {/* Single Menu Modal */}
       <SingleMenuModal
         open={modalOpen}
@@ -259,13 +255,8 @@ const MenuItemList = ({ menuItems = [] }) => {
       )}
 
       <style>{`
-        @keyframes slideIn {
-          from { transform: translateX(100%); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-        .animate-slideIn {
-          animation: slideIn 0.3s ease-out;
-        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .animate-slideIn { animation: slideIn 0.3s ease-out; }
 
         @keyframes bounce-heart {
           0% { transform: scale(1); }
@@ -274,9 +265,7 @@ const MenuItemList = ({ menuItems = [] }) => {
           75% { transform: scale(1.2); }
           100% { transform: scale(1); }
         }
-        .animate-bounce-heart {
-          animation: bounce-heart 0.3s ease-out;
-        }
+        .animate-bounce-heart { animation: bounce-heart 0.3s ease-out; }
       `}</style>
     </div>
   );

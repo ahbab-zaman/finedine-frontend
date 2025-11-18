@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useToast } from "./ToastProvider";
 
-const AddCategoryModal = ({ open, onClose }) => {
+const AddCategoryModal = ({ open, onClose, onCategoryAdded }) => {
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
   const [loading, setLoading] = useState(false);
+  const toast = useToast(); // Use toast for notifications
 
   if (!open) return null;
 
@@ -20,17 +22,29 @@ const AddCategoryModal = ({ open, onClose }) => {
         }
       );
       const result = await res.json();
+
       if (result.success) {
-        alert("Category added!");
+        toast.push({
+          message: "Category added successfully!",
+          type: "success",
+        });
         setName("");
         setDesc("");
         onClose();
+
+        // Trigger parent refresh
+        if (typeof onCategoryAdded === "function") {
+          onCategoryAdded();
+        }
       } else {
-        alert(result.message);
+        toast.push({
+          message: result.message || "Failed to add category",
+          type: "error",
+        });
       }
     } catch (err) {
       console.error(err);
-      alert("Error adding category");
+      toast.push({ message: "Error adding category", type: "error" });
     } finally {
       setLoading(false);
     }
