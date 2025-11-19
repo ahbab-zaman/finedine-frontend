@@ -4,6 +4,7 @@ import { ArrowUpIcon } from "@heroicons/react/24/outline";
 import CategoryList from "../components/CategoryList";
 import MenuItemList from "../components/MenuItemList";
 import SingleMenuModal from "../components/SingleMenuModal";
+import Loading from "../components/Loading";
 
 const Home = () => {
   const location = useLocation();
@@ -170,11 +171,7 @@ const Home = () => {
   );
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-xl">Loading menu...</div>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
@@ -194,9 +191,7 @@ const Home = () => {
           {/* Sticky Category Navigation */}
           <div
             className={`border-b border-gray-200 py-3 transition-all duration-300 md:sticky md:z-30 md:border-b md:border-gray-200 md:py-3 ${
-              isScrolled
-                ? "md:top-0 bg-[#F6F9FC]"
-                : "md:top-[70px]"
+              isScrolled ? "md:top-0 bg-[#F6F9FC]" : "md:top-[70px]"
             }`}
           >
             <CategoryList

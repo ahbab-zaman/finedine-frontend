@@ -9,6 +9,7 @@ import {
   Home,
   Edit3,
   Star,
+  SquareMenu,
 } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import logo from "../assets/fine-dine-logo.png";
@@ -84,7 +85,7 @@ const Navbar = ({ hidden = false }) => {
             {isAuth && (
               <NavLink
                 to="/cart"
-                className="relative p-2 text-gray-600 hover:text-blue-600 transition-all hover:scale-110"
+                className="relative p-2 text-gray-600 hover:text-[#C30C46] transition-all hover:scale-110"
               >
                 <ShoppingCart size={22} />
                 {cartCount > 0 && (
@@ -156,7 +157,7 @@ const Navbar = ({ hidden = false }) => {
               <SidebarLink
                 to="/my-menu"
                 label="My Menu"
-                Icon={Edit3}
+                Icon={SquareMenu}
                 close={setSidebarOpen}
               />
               <SidebarLink
@@ -204,7 +205,7 @@ const SidebarLink = ({ to, label, Icon, close }) => (
     className={({ isActive }) =>
       `flex items-center gap-3 p-3 rounded-lg transition group ${
         isActive
-          ? "bg-blue-100 text-blue-600"
+          ? "bg-pink-100 text-[#C30C46]"
           : "hover:bg-gray-100 text-gray-700"
       }`
     }
@@ -215,11 +216,11 @@ const SidebarLink = ({ to, label, Icon, close }) => (
           size={20}
           className={`${
             isActive
-              ? "text-blue-600"
-              : "text-gray-600 group-hover:text-blue-600"
+              ? "text-[#C30C46]"
+              : "text-gray-600 group-hover:text-[#C30C46]"
           }`}
         />
-        <span className="font-medium group-hover:text-blue-600">{label}</span>
+        <span className="font-medium group-hover:text-[#C30C46]">{label}</span>
       </>
     )}
   </NavLink>

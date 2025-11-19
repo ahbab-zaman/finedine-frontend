@@ -12,6 +12,7 @@ import {
   Trash2,
   AlertTriangle,
 } from "lucide-react";
+import Loading from "../components/Loading";
 
 const ProfilePage = () => {
   const [activeSection, setActiveSection] = useState("personal"); // 'personal' or 'settings'
@@ -112,13 +113,7 @@ const ProfilePage = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center text-gray-500 animate-pulse">
-          Loading...
-        </div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!user) {
@@ -145,7 +140,7 @@ const ProfilePage = () => {
       <div className="flex">
         {/* Sidebar */}
         <aside
-          className={`fixed h-full w-64 bg-white border-r border-gray-200 flex flex-col py-6 px-0 z-50 transform transition-all duration-300 ease-in-out md:static md:translate-x-0 md:w-72 md:pt-16 md:h-screen md:inset-auto md:top-auto md:left-auto ${
+          className={`fixed h-full w-64 bg-white border-r border-gray-200 flex flex-col py-6 px-0 transform transition-all duration-300 ease-in-out md:static md:translate-x-0 md:w-72 md:pt-16 md:h-screen md:inset-auto md:top-auto md:left-auto ${
             showSidebar ? "translate-x-0 shadow-2xl" : "-translate-x-full"
           } md:shadow-none`}
         >

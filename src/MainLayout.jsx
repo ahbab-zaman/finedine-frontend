@@ -23,7 +23,7 @@ const MainLayout = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-white text-[#575962]">
+    <div className="min-h-screen bg-white text-[#575962] select-none">
       {/* Navbar */}
       <Navbar hidden={navbarHidden} />
 

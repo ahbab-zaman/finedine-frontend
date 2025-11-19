@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { useToast } from "../components/ToastProvider";
+import Loading from "../components/Loading";
 
 const Cart = () => {
   const [cart, setCart] = useState({ items: [] });
@@ -206,12 +207,9 @@ const Cart = () => {
 
   if (loading) {
     return (
-      <div className="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen pt-6 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="mx-auto h-12 w-12 animate-spin text-[#E6034B]" />
-          <p className="mt-4 text-lg text-gray-600">Loading your cart...</p>
-        </div>
-      </div>
+      <>
+        <Loading />
+      </>
     );
   }
 
