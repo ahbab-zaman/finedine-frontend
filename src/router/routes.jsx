@@ -10,6 +10,7 @@ import Cart from "../pages/Cart";
 import MyMenu from "../pages/MyMenu";
 import AddReview from "../pages/AddReview";
 import ProfilePage from "../pages/ProfilePage";
+import { ToastProvider } from "../components/ToastProvider";
 
 const router = createBrowserRouter([
   {
@@ -50,7 +51,9 @@ const router = createBrowserRouter([
     path: "/login",
     element: (
       <GuestRoute>
-        <Login />
+        <ToastProvider>
+          <Login />
+        </ToastProvider>
       </GuestRoute>
     ),
   },
@@ -58,7 +61,9 @@ const router = createBrowserRouter([
     path: "/register",
     element: (
       <GuestRoute>
-        <Register />
+        <ToastProvider>
+          <Register />
+        </ToastProvider>
       </GuestRoute>
     ),
   },

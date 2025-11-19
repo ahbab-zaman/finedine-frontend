@@ -292,7 +292,7 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
               </p>
               <button
                 onClick={() => navigate("/create-menu")}
-                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 shadow-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="px-8 py-3 bg-[#e6034bs] text-white rounded-xl hover:bg-pink-400 shadow-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2"
                 aria-label="Create your first menu item"
               >
                 Create Your First Item
