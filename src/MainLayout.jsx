@@ -17,20 +17,23 @@ const MainLayout = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Set initial state
+    handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-gray-50 text-[#575962]">
-      <div>
-        <Navbar hidden={navbarHidden} />
-      </div>
+    <div className="min-h-screen bg-white text-[#575962]">
+      {/* Navbar */}
+      <Navbar hidden={navbarHidden} />
+
+      {/* Content Wrapper */}
       <div
-        className={`transition-all duration-300 ${
-          navbarHidden ? "pt-0" : "pt-[70px]"
-        }`}
+        className="transition-all duration-300"
+        style={{
+          paddingTop: "40px",
+          minHeight: "calc(100vh - 68px)",
+        }}
       >
         <ToastProvider>
           <Outlet />

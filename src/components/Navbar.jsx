@@ -165,6 +165,12 @@ const Navbar = ({ hidden = false }) => {
                 Icon={Star}
                 close={setSidebarOpen}
               />
+              <SidebarLink
+                to="/profile"
+                label="Profile"
+                Icon={User}
+                close={setSidebarOpen}
+              />
 
               {/* MOBILE + DESKTOP LOGOUT */}
               <button

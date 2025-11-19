@@ -7,8 +7,9 @@ import GuestRoute from "../utils/GuestRoute";
 import Home from "../layout/Home";
 import MenuDetail from "../pages/MenuDetail";
 import Cart from "../pages/Cart";
-import CreateMenuItem from "../pages/CreateMenuItem";
 import MyMenu from "../pages/MyMenu";
+import AddReview from "../pages/AddReview";
+import ProfilePage from "../pages/ProfilePage";
 
 const router = createBrowserRouter([
   {
@@ -32,12 +33,16 @@ const router = createBrowserRouter([
         element: <Cart />,
       },
       {
-        path: "create-menu",
-        element: <CreateMenuItem />,
-      },
-      {
         path: "my-menu",
         element: <MyMenu />,
+      },
+      {
+        path: "/add-review",
+        element: <AddReview />,
+      },
+      {
+        path: "/profile",
+        element: <ProfilePage />,
       },
     ],
   },

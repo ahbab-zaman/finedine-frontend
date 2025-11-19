@@ -179,7 +179,7 @@ const Home = () => {
 
   return (
     <div
-      className={`bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen transition-all duration-300 ${
+      className={`bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen transition-all duration-300 pt-6 ${
         isScrolled ? "md:pt-0" : ""
       }`}
     >
