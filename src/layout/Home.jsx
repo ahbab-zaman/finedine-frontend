@@ -171,9 +171,7 @@ const Home = () => {
   );
 
   if (loading) {
-    return (
-      <Loading />
-    );
+    return <Loading />;
   }
 
   return (
@@ -193,9 +191,7 @@ const Home = () => {
           {/* Sticky Category Navigation */}
           <div
             className={`border-b border-gray-200 py-3 transition-all duration-300 md:sticky md:z-30 md:border-b md:border-gray-200 md:py-3 ${
-              isScrolled
-                ? "md:top-0 bg-[#F6F9FC]"
-                : "md:top-[70px]"
+              isScrolled ? "md:top-0 bg-[#F6F9FC]" : "md:top-[70px]"
             }`}
           >
             <CategoryList
