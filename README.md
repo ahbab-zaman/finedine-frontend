@@ -68,7 +68,7 @@ A clean, modern, and minimal UI React application for managing menu items, categ
 
 Use the following demo account to explore the app:
 
-**Email: user@gmail.com**
+**Email: test@gmail.com**
 **Password: User123@**
 
 ---
