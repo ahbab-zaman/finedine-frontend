@@ -92,6 +92,8 @@ Use the following demo account to explore the app:
 
 ## 📁 Folder Structure
 
+
+```markdown
 src/
 ├── assets/ # Images, icons, fonts, static files
 ├── components/ # Reusable UI components
@@ -102,7 +104,7 @@ src/
 ├── routes/ # Routing configuration
 ├── App.jsx # Root application component
 └── main.jsx # Application entry point
-
+```
 
 
 ## ⚙️ Installation
@@ -110,7 +112,7 @@ src/
 Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/fine-dine-menu-f.git
+git clone https://github.com/ahbab-zaman/finedine-frontend
 cd fine-dine-menu-f
 npm install
 npm run dev
