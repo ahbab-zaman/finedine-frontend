@@ -27,8 +27,6 @@ A clean, modern, and minimal UI React application for managing menu items, categ
 
 ---
 
----
-
 ## 🔗 Frontend Live URL
 
 ➡️ **Frontend Application:** https://fine-dine-menu.netlify.app
