@@ -98,8 +98,13 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
         resetForm();
         setOpenAddMenu(false);
 
-        // 🚀 Refresh menus instantly
+        // Refresh menus instantly if needed
         refreshMenus && refreshMenus();
+
+        // 🔥 Navigate to home page after adding
+        navigate("/", { replace: true }); // replace avoids history stacking
+        // Optional: force full reload
+        // window.location.href = "/";
       } else {
         toast.push({
           message: result.message || "Failed to create menu item",
@@ -291,8 +296,8 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
                 Get started by creating your first delicious menu item!
               </p>
               <button
-                onClick={() => navigate("/create-menu")}
-                className="px-8 py-3 bg-[#e6034bs] text-white rounded-xl hover:bg-pink-400 shadow-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                onClick={() => setOpenAddMenu(true)}
+                className="px-8 py-3 bg-[#e6034b] text-white rounded-xl hover:bg-[#C30C46] shadow-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2"
                 aria-label="Create your first menu item"
               >
                 Create Your First Item

@@ -15,6 +15,32 @@ const MenuItemList = ({ menuItems = [] }) => {
   const toast = useToast();
 
   // Fetch cart items on mount
+  // useEffect(() => {
+  //   const fetchCart = async () => {
+  //     if (!isAuth) return;
+  //     try {
+  //       const res = await fetch(
+  //         `${import.meta.env.VITE_API_BASE_URL}/api/cart`,
+  //         {
+  //           headers: { Authorization: `Bearer ${token}` },
+  //         }
+  //       );
+  //       if (res.status === 401 || res.status === 403) {
+  //         console.error("Session expired");
+  //         return;
+  //       }
+  //       const result = await res.json();
+  //       if (result.success) {
+  //         setCartIds(result.cart.items.map((i) => i.menuItem._id));
+  //       }
+  //     } catch (err) {
+  //       console.error("Failed to fetch cart:", err);
+  //       toast.push({ message: "Failed to load cart", type: "error" });
+  //     }
+  //   };
+  //   fetchCart();
+  // }, [token, isAuth, toast]);
+
   useEffect(() => {
     const fetchCart = async () => {
       if (!isAuth) return;
@@ -31,7 +57,12 @@ const MenuItemList = ({ menuItems = [] }) => {
         }
         const result = await res.json();
         if (result.success) {
-          setCartIds(result.cart.items.map((i) => i.menuItem._id));
+          // Prevent errors if menuItem is null
+          setCartIds(
+            result.cart.items
+              .filter((i) => i.menuItem)
+              .map((i) => i.menuItem._id)
+          );
         }
       } catch (err) {
         console.error("Failed to fetch cart:", err);
@@ -40,7 +71,6 @@ const MenuItemList = ({ menuItems = [] }) => {
     };
     fetchCart();
   }, [token, isAuth, toast]);
-
   const toggleCart = async (menuId, itemName) => {
     if (!isAuth) {
       toast.push({
@@ -63,25 +93,35 @@ const MenuItemList = ({ menuItems = [] }) => {
           }
         );
         const cartData = await cartRes.json();
-        const found = cartData.cart.items.find(
-          (c) => c.menuItem._id === menuId
+
+        if (!cartData.success) throw new Error("Failed to fetch cart");
+
+        // Find the cart item ID
+        const cartItem = cartData.cart.items.find(
+          (c) => c.menuItem?._id === menuId
         );
-        if (found) {
-          await fetch(
-            `${import.meta.env.VITE_API_BASE_URL}/api/cart/${found._id}`,
+
+        if (cartItem) {
+          const delRes = await fetch(
+            `${import.meta.env.VITE_API_BASE_URL}/api/cart/${cartItem._id}`,
             {
               method: "DELETE",
               headers: { Authorization: `Bearer ${token}` },
             }
           );
+
+          const delResult = await delRes.json();
+          if (!delResult.success)
+            throw new Error(delResult.message || "Failed to remove");
+
+          // Update local state
+          setCartIds((prev) => prev.filter((id) => id !== menuId));
+          toast.push({
+            message: `${itemName} removed from cart`,
+            type: "success",
+          });
+          window.dispatchEvent(new CustomEvent("cartUpdated"));
         }
-        setCartIds((prev) => prev.filter((id) => id !== menuId));
-        toast.push({
-          message: `${itemName} removed from cart`,
-          type: "success",
-        });
-        // Dispatch event to update cart count in Navbar
-        window.dispatchEvent(new CustomEvent("cartUpdated"));
       } else {
         // Add to cart
         const res = await fetch(
@@ -96,32 +136,23 @@ const MenuItemList = ({ menuItems = [] }) => {
           }
         );
         const result = await res.json();
-        if (result.success) {
-          setCartIds((prev) => [...prev, menuId]);
-          toast.push({
-            message: `${itemName} added to cart!`,
-            type: "success",
-          });
+        if (!result.success) throw new Error(result.message || "Failed to add");
 
-          // Trigger bounce animation
-          setBouncingIds((prev) => [...prev, menuId]);
-          setTimeout(() => {
-            setBouncingIds((prev) => prev.filter((id) => id !== menuId));
-          }, 300);
+        setCartIds((prev) => [...prev, menuId]);
+        toast.push({ message: `${itemName} added to cart!`, type: "success" });
 
-          // Dispatch event to update cart count in Navbar
-          window.dispatchEvent(new CustomEvent("cartUpdated"));
-        } else {
-          toast.push({
-            message: result.message || "Failed to add to cart",
-            type: "error",
-          });
-        }
+        // Trigger bounce animation
+        setBouncingIds((prev) => [...prev, menuId]);
+        setTimeout(() => {
+          setBouncingIds((prev) => prev.filter((id) => id !== menuId));
+        }, 300);
+
+        window.dispatchEvent(new CustomEvent("cartUpdated"));
       }
     } catch (err) {
       console.error("Cart operation failed:", err);
       toast.push({
-        message: "Failed to update cart. Please try again.",
+        message: err.message || "Cart operation failed",
         type: "error",
       });
     } finally {

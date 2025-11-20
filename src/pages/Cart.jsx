@@ -39,9 +39,10 @@ const Cart = () => {
         );
         const result = await res.json();
         if (result.success) {
-          setCart(result.cart);
+          const validItems = result.cart.items.filter((i) => i.menuItem);
+          setCart({ ...result.cart, items: validItems });
           setTotal(
-            result.cart.items.reduce(
+            validItems.reduce(
               (sum, item) => sum + item.menuItem.price * item.quantity,
               0
             )
@@ -90,9 +91,10 @@ const Cart = () => {
       );
       const result = await res.json();
       if (result.success) {
-        setCart(result.cart);
+        const validItems = result.cart.items.filter((i) => i.menuItem);
+        setCart({ ...result.cart, items: validItems });
         setTotal(
-          result.cart.items.reduce(
+          validItems.reduce(
             (sum, item) => sum + item.menuItem.price * item.quantity,
             0
           )
@@ -131,9 +133,10 @@ const Cart = () => {
       );
       const result = await res.json();
       if (result.success) {
-        setCart(result.cart);
+        const validItems = result.cart.items.filter((i) => i.menuItem);
+        setCart({ ...result.cart, items: validItems });
         setTotal(
-          result.cart.items.reduce(
+          validItems.reduce(
             (sum, item) => sum + item.menuItem.price * item.quantity,
             0
           )
@@ -205,13 +208,7 @@ const Cart = () => {
 
   if (!isAuth) return null;
 
-  if (loading) {
-    return (
-      <>
-        <Loading />
-      </>
-    );
-  }
+  if (loading) return <Loading />;
 
   return (
     <>
@@ -221,6 +218,7 @@ const Cart = () => {
             <ShoppingBag size={32} className="text-[#E6034B]" />
             Your Cart
           </h1>
+
           {cart.items.length === 0 ? (
             <div className="text-center py-20">
               <ShoppingBag size={80} className="mx-auto mb-6 text-gray-300" />
@@ -233,7 +231,6 @@ const Cart = () => {
               <button
                 onClick={() => navigate("/")}
                 className="px-8 py-3 bg-[#E6034B] text-white rounded-xl hover:bg-[#d41350] shadow-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#E6034B] focus:ring-offset-2"
-                aria-label="Browse menu items"
               >
                 Browse Menu
               </button>
@@ -241,94 +238,103 @@ const Cart = () => {
           ) : (
             <>
               <div className="space-y-4 mb-8">
-                {cart.items.map((cartItem) => (
-                  <article
-                    key={cartItem._id}
-                    className="bg-white rounded-2xl shadow-md p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden group"
-                    role="listitem"
-                    aria-label={`Cart item: ${cartItem.menuItem.item_name}`}
-                  >
-                    <div className="flex items-start gap-4 flex-1 min-w-0">
-                      <img
-                        src={`${import.meta.env.VITE_API_BASE_URL}/uploads/${
-                          cartItem.menuItem.images[0] || ""
-                        }`}
-                        alt={cartItem.menuItem.item_name}
-                        className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-xl shadow-sm flex-shrink-0"
-                        loading="lazy"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <h3 className="text-base md:text-lg font-semibold text-gray-800 truncate">
-                          {cartItem.menuItem.item_name}
-                        </h3>
-                        <p className="text-gray-600 text-sm md:text-base font-medium mt-1">
-                          ${cartItem.menuItem.price.toFixed(2)}
-                        </p>
-                        {cartItem.menuItem.description && (
-                          <p className="text-gray-500 text-xs mt-2 line-clamp-2">
-                            {cartItem.menuItem.description}
+                {cart.items.map((cartItem) => {
+                  const menu = cartItem.menuItem;
+                  return (
+                    <article
+                      key={cartItem._id}
+                      className="bg-white rounded-2xl shadow-md p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden group"
+                      role="listitem"
+                      aria-label={`Cart item: ${
+                        menu?.item_name || "Item deleted"
+                      }`}
+                    >
+                      <div className="flex items-start gap-4 flex-1 min-w-0">
+                        <img
+                          src={`${import.meta.env.VITE_API_BASE_URL}/uploads/${
+                            menu?.images?.[0] || ""
+                          }`}
+                          alt={menu?.item_name || "Deleted item"}
+                          className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-xl shadow-sm flex-shrink-0"
+                          loading="lazy"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-base md:text-lg font-semibold text-gray-800 truncate">
+                            {menu?.item_name || "Item no longer available"}
+                          </h3>
+                          <p className="text-gray-600 text-sm md:text-base font-medium mt-1">
+                            ${menu?.price?.toFixed(2) || "0.00"}
                           </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between w-full md:w-auto gap-4 md:gap-6">
-                      <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-full shadow-inner min-w-[120px] justify-center">
-                        <button
-                          onClick={() =>
-                            updateQuantity(cartItem._id, cartItem.quantity - 1)
-                          }
-                          disabled={updating.has(cartItem._id)}
-                          className="p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                          aria-label={`Decrease quantity of ${cartItem.menuItem.item_name}`}
-                        >
-                          {updating.has(cartItem._id) ? (
-                            <Loader2 size={16} className="animate-spin" />
-                          ) : (
-                            <Minus size={16} />
+                          {menu?.description && (
+                            <p className="text-gray-500 text-xs mt-2 line-clamp-2">
+                              {menu.description}
+                            </p>
                           )}
-                        </button>
-                        <span className="w-8 text-center font-bold text-gray-800 text-sm">
-                          {cartItem.quantity}
-                        </span>
-                        <button
-                          onClick={() =>
-                            updateQuantity(cartItem._id, cartItem.quantity + 1)
-                          }
-                          disabled={updating.has(cartItem._id)}
-                          className="p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                          aria-label={`Increase quantity of ${cartItem.menuItem.item_name}`}
-                        >
-                          {updating.has(cartItem._id) ? (
-                            <Loader2 size={16} className="animate-spin" />
-                          ) : (
-                            <Plus size={16} />
-                          )}
-                        </button>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => removeItem(cartItem._id)}
-                          disabled={updating.has(cartItem._id)}
-                          className="p-2 text-red-500 hover:text-red-600 transition-colors disabled:opacity-50"
-                          aria-label={`Remove ${cartItem.menuItem.item_name} from cart`}
-                        >
-                          {updating.has(cartItem._id) ? (
-                            <Loader2 size={18} className="animate-spin" />
-                          ) : (
-                            <Trash2 size={18} />
-                          )}
-                        </button>
-                        <button
-                          className="p-2 text-gray-400 hover:text-red-500 transition-colors relative"
-                          aria-label={`Add ${cartItem.menuItem.item_name} to wishlist`}
-                        >
-                          <Heart size={18} className="transition-colors" />
-                        </button>
+
+                      <div className="flex items-center justify-between w-full md:w-auto gap-4 md:gap-6">
+                        <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-full shadow-inner min-w-[120px] justify-center">
+                          <button
+                            onClick={() =>
+                              updateQuantity(
+                                cartItem._id,
+                                cartItem.quantity - 1
+                              )
+                            }
+                            disabled={updating.has(cartItem._id)}
+                            className="p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {updating.has(cartItem._id) ? (
+                              <Loader2 size={16} className="animate-spin" />
+                            ) : (
+                              <Minus size={16} />
+                            )}
+                          </button>
+                          <span className="w-8 text-center font-bold text-gray-800 text-sm">
+                            {cartItem.quantity}
+                          </span>
+                          <button
+                            onClick={() =>
+                              updateQuantity(
+                                cartItem._id,
+                                cartItem.quantity + 1
+                              )
+                            }
+                            disabled={updating.has(cartItem._id)}
+                            className="p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {updating.has(cartItem._id) ? (
+                              <Loader2 size={16} className="animate-spin" />
+                            ) : (
+                              <Plus size={16} />
+                            )}
+                          </button>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => removeItem(cartItem._id)}
+                            disabled={updating.has(cartItem._id)}
+                            className="p-2 text-red-500 hover:text-red-600 transition-colors disabled:opacity-50"
+                          >
+                            {updating.has(cartItem._id) ? (
+                              <Loader2 size={18} className="animate-spin" />
+                            ) : (
+                              <Trash2 size={18} />
+                            )}
+                          </button>
+                          <button className="p-2 text-gray-400 hover:text-red-500 transition-colors relative">
+                            <Heart size={18} className="transition-colors" />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  </article>
-                ))}
+                    </article>
+                  );
+                })}
               </div>
+
+              {/* Subtotal & Actions */}
               <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 sticky bottom-0 md:static">
                 <div className="flex justify-between items-center mb-6 text-lg md:text-xl">
                   <span className="font-bold text-gray-800">Subtotal:</span>
@@ -341,14 +347,12 @@ const Cart = () => {
                     onClick={clearCart}
                     className="flex-1 px-6 py-3 bg-gray-500 text-white rounded-xl hover:bg-gray-600 shadow-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50"
                     disabled={cart.items.length === 0 || loading}
-                    aria-label="Clear all items from cart"
                   >
                     Clear Cart
                   </button>
                   <button
                     onClick={() => navigate("/")}
                     className="flex-1 px-6 py-3 bg-[#E6034B] text-white rounded-xl hover:bg-[#d41350] shadow-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#E6034B] focus:ring-offset-2"
-                    aria-label="Continue shopping"
                   >
                     Continue Shopping
                   </button>
@@ -362,7 +366,7 @@ const Cart = () => {
         </div>
       </div>
 
-      {/* Custom Clear Cart Confirmation Modal */}
+      {/* Clear Cart Confirmation */}
       {showClearConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 bg-opacity-50 animate-fade-in">
           <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4 transform animate-slide-up max-h-[90vh] overflow-y-auto">
@@ -371,7 +375,6 @@ const Cart = () => {
               <button
                 onClick={() => setShowClearConfirm(false)}
                 className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                aria-label="Close dialog"
               >
                 <X size={20} />
               </button>
