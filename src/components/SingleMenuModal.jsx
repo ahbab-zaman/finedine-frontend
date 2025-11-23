@@ -1,6 +1,37 @@
 import React, { useState, useEffect } from "react";
 import { Heart } from "lucide-react";
 
+const getIngredientIcon = (ingredient) => {
+  const lower = ingredient.toLowerCase().trim();
+  const icons = {
+    tomatoes: "https://www.svgrepo.com/show/447187/tomato-organic.svg",
+    lemon: "",
+    garlic: "https://www.svgrepo.com/download/218306.svg",
+    shrimp: "https://www.svgrepo.com/download/489697.svg",
+    basil: "https://www.svgrepo.com/download/417245.svg",
+    cheese: "https://www.svgrepo.com/download/505201.svg",
+    onion: "https://www.svgrepo.com/download/37669.svg",
+    mushroom: "https://www.svgrepo.com/download/492648.svg",
+    carrot: "https://www.svgrepo.com/download/506711.svg",
+    lettuce: "https://www.svgrepo.com/download/311567.svg",
+    romaine: "https://www.svgrepo.com/download/311567.svg",
+    herbs: "https://www.svgrepo.com/download/198458.svg",
+    "olive oil": "https://www.svgrepo.com/download/223265.svg",
+    butter: "https://www.svgrepo.com/download/1091.svg",
+    chicken: "https://www.svgrepo.com/download/530224.svg",
+    beef: "https://www.svgrepo.com/download/530206.svg",
+    pasta: "https://www.svgrepo.com/download/24257.svg",
+    rice: "https://www.svgrepo.com/download/505200.svg",
+    egg: "https://www.svgrepo.com/download/505209.svg",
+    milk: "https://www.svgrepo.com/download/486303.svg",
+    flour: "https://www.svgrepo.com/download/86109.svg",
+    // Add more mappings as needed
+  };
+  return (
+    icons[lower] || icons.herbs || "https://www.svgrepo.com/download/198458.svg"
+  ); // Default to herbs
+};
+
 const SingleMenuModal = ({
   open,
   onClose,
@@ -29,6 +60,19 @@ const SingleMenuModal = ({
 
   // If modal not open or no item, render nothing
   if (!open || !item) return null;
+
+  let ingredientsStr = "";
+  if (typeof item.ingredients === "string") {
+    ingredientsStr = item.ingredients;
+  } else if (Array.isArray(item.ingredients)) {
+    ingredientsStr = item.ingredients.join(", ");
+  } else if (item.ingredients) {
+    ingredientsStr = String(item.ingredients);
+  }
+  const ingredientsList = ingredientsStr
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 
   return (
     <div
@@ -109,13 +153,18 @@ const SingleMenuModal = ({
 
                 {/* Ingredients */}
                 <div className="flex flex-wrap gap-2">
-                  {item.ingredients?.map((ing, idx) => (
+                  {ingredientsList.map((ing, idx) => (
                     <span
                       key={idx}
-                      className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-sm flex items-center gap-1"
+                      className="relative inline-block p-2 bg-pink-100 rounded-full flex items-center justify-center"
                     >
-                      <span>🍴</span>
-                      {ing}
+                      <img
+                        src={getIngredientIcon(ing)}
+                        alt={ing}
+                        title={ing}
+                        className="w-6 h-6 object-cover rounded-full"
+                        loading="lazy"
+                      />
                     </span>
                   ))}
                 </div>

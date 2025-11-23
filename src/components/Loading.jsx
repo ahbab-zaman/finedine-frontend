@@ -4,7 +4,7 @@ const Loading = () => {
       role="button"
       aria-label="animation"
       tabIndex={0}
-      className="w-[400px] h-[400px] overflow-hidden mx-auto outline-none"
+      className="w-[350px] h-[350px] overflow-hidden mx-auto outline-none"
     >
       <style jsx>{`
         @keyframes spin {

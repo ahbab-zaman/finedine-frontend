@@ -22,9 +22,115 @@ import SingleMenuModal from "../components/SingleMenuModal";
 import Loading from "../components/Loading";
 import { useToast } from "../components/ToastProvider";
 import AddCategoryModal from "../components/AddCategoryModal";
-
 const PLACEHOLDER_SVG = "data:image/svg+xml;base64,...";
-
+const PLACEHOLDER_IMAGE =
+  "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=400&fit=crop";
+const dummySectionTitles = [
+  "Appetizers",
+  "Soups",
+  "Entrees",
+  "Seafood",
+  "Grilled Specials",
+  "Pasta & Noodles",
+  "Vegetarian Delights",
+  "Desserts",
+  "Sweets",
+  "Beverages",
+  "Drinks",
+  "Cocktails",
+];
+const dummySectionDescriptions = [
+  "Kick off your meal with light and flavorful bites.",
+  "Fresh and crisp options to refresh your palate.",
+  "Warm, comforting bowls to soothe the soul.",
+  "Hearty dishes made with love and fresh ingredients.",
+  "Ocean's finest, prepared to perfection.",
+  "Sizzling favorites from the grill.",
+  "Twirl into comfort with our pasta selections.",
+  "Plant-based wonders for every craving.",
+  "Indulge in decadent endings to your meal.",
+  "Quench your thirst with our refreshing selections.",
+  "Artisan mixes for a perfect unwind.",
+];
+const dummyItemNames = [
+  "Grilled Shrimp Skewers",
+  "Caesar Salad",
+  "Tomato Basil Soup",
+  "Margherita Pizza",
+  "Spaghetti Carbonara",
+  "Grilled Salmon",
+  "Veggie Stir-Fry",
+  "Chocolate Lava Cake",
+  "Lemonade",
+  "Caprese Skewers",
+  "Beef Burger",
+  "Mushroom Risotto",
+  "Tiramisu",
+  "Mojito",
+  "Falafel Wrap",
+  "Chicken Alfredo",
+  "Berry Cheesecake",
+  "Iced Tea",
+  "Quinoa Bowl",
+  "Truffle Fries",
+];
+const dummyItemDescriptions = [
+  "Succulent shrimp marinated in garlic and herbs, grilled to juicy perfection.",
+  "Classic romaine with crunchy croutons, parmesan, and creamy dressing.",
+  "Hearty tomato and basil soup, slow-simmered for rich flavor.",
+  "Thin crust topped with fresh mozzarella, tomatoes, and basil.",
+  "Al dente pasta tossed in a silky egg and cheese sauce with pancetta.",
+  "Wild-caught salmon seared with lemon butter and fresh dill.",
+  "Crispy vegetables wok-tossed in a savory soy-ginger glaze.",
+  "Warm chocolate center oozing from a molten cake shell.",
+  "Freshly squeezed lemons with a hint of mint and sparkling water.",
+  "Cherry tomatoes, mozzarella, and basil on balsamic-glazed skewers.",
+  "Juicy patty with melted cheddar, lettuce, and tomato on a brioche bun.",
+  "Creamy arborio rice infused with earthy mushrooms and white wine.",
+  "Layers of coffee-soaked ladyfingers and mascarpone cream.",
+  "Crushed mint, lime, and rum shaken over ice.",
+  "Crispy chickpea patties in warm pita with tahini and veggies.",
+  "Tender chicken in a velvety Alfredo sauce over fettuccine.",
+  "Silky cheesecake topped with seasonal mixed berries.",
+  "Brewed black tea chilled and served with a lemon twist.",
+  "Nutty quinoa with roasted veggies, feta, and lemon vinaigrette.",
+  "Crispy fries tossed in truffle oil and parmesan.",
+];
+const dummyIngredients = [
+  "shrimp, garlic, lemon, olive oil, herbs",
+  "romaine lettuce, croutons, parmesan, anchovies, caesar dressing",
+  "tomatoes, basil, onions, vegetable stock, cream",
+  "pizza dough, mozzarella, tomatoes, basil, olive oil",
+  "spaghetti, eggs, pecorino, pancetta, black pepper",
+  "salmon fillet, lemon, butter, dill, salt",
+  "broccoli, carrots, bell peppers, soy sauce, ginger",
+  "dark chocolate, butter, eggs, sugar, flour",
+  "lemons, sugar, water, mint leaves",
+  "cherry tomatoes, mozzarella, basil, balsamic glaze",
+  "ground beef, cheddar, lettuce, tomato, brioche bun",
+  "arborio rice, mushrooms, white wine, parmesan, stock",
+  "ladyfingers, mascarpone, coffee, cocoa, eggs",
+  "rum, mint, lime, sugar, soda water",
+  "chickpeas, tahini, pita, cucumber, tomatoes",
+  "chicken breast, fettuccine, cream, parmesan, garlic",
+  "cream cheese, graham cracker, berries, sugar",
+  "black tea leaves, lemon, sugar, ice",
+  "quinoa, feta, zucchini, eggplant, lemon juice",
+  "potatoes, truffle oil, parmesan, parsley",
+];
+const dummyImages = [
+  "https://images.unsplash.com/photo-1670237735381-ac5c7fa72c51?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y2Vhc2VyJTIwc2FsYWR8ZW58MHx8MHx8fDA%3D",
+  "https://images.unsplash.com/photo-1730312382513-62e9454f4797?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8VG9tYXRvJTIwQmFzaWwlMjBTb3VwfGVufDB8fDB8fHww",
+  "https://plus.unsplash.com/premium_photo-1661762555601-47d088a26b50?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8UGl6emF8ZW58MHx8MHx8fDA%3D",
+  "https://images.unsplash.com/photo-1633337474564-1d9478ca4e2e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8Q2FyYm9uYXJhfGVufDB8fDB8fHww",
+  "https://images.unsplash.com/photo-1653379557259-48a725b08460?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fEZhbGFmZWwlMjBXcmFwfGVufDB8fDB8fHww",
+  "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8QmVlZiUyMEJ1cmdlcnxlbnwwfHwwfHx8MA%3D%3D",
+  "https://images.unsplash.com/photo-1499961024600-ad094db305cc?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8SWNlZCUyMHRlYXxlbnwwfHwwfHx8MA%3D%3D",
+  "https://images.unsplash.com/photo-1675595831597-6fb5f5e2556e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8VHRydWZmbGUlMjBmcmllc3xlbnwwfHwwfHx8MA%3D%3D",
+  "https://images.unsplash.com/photo-1586040140378-b5634cb4c8fc?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fFRpcmFtaXN1fGVufDB8fDB8fHww",
+  "https://images.unsplash.com/photo-1664214649073-f4250ad39390?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Umlzc290b3xlbnwwfHwwfHx8MA%3D%3D",
+  "https://plus.unsplash.com/premium_photo-1723651343962-75cd6cc5c308?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fEJlcnJ5JTIwQ2hlc3NlJTIwY2FrZXxlbnwwfHwwfHx8MA%3D%3D",
+];
 const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
   const [items, setItems] = useState([]);
   const [cartIds, setCartIds] = useState([]);
@@ -34,7 +140,7 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
   const [viewOpen, setViewOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedDeleteId, setSelectedDeleteId] = useState(null);
-  const { token, user } = useAuthStore(); // Assuming user is available in store with _id
+  const { token, user } = useAuthStore();
   const navigate = useNavigate();
   const [openAddCategory, setOpenAddCategory] = useState(false);
   const [openAddMenu, setOpenAddMenu] = useState(false);
@@ -50,10 +156,10 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
   const [imagePreviews, setImagePreviews] = useState([]);
   const toast = useToast();
   const [allCategories, setAllCategories] = useState([]);
-
   // New states for dynamic menu creation
   const [language, setLanguage] = useState("English");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategoryName, setSelectedCategoryName] = useState("");
   const [sections, setSections] = useState([
     {
       id: 1,
@@ -62,15 +168,16 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
       image: null,
       expanded: true,
       items: [],
-    }
+    },
   ]);
-
+  // New state for preview modal after adding
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [allMenuItemsForPreview, setAllMenuItemsForPreview] = useState([]);
   const updateSection = (sectionId, field, value) => {
     setSections((prev) =>
       prev.map((s) => (s.id === sectionId ? { ...s, [field]: value } : s))
     );
   };
-
   const toggleSection = (sectionId) => {
     setSections((prev) =>
       prev.map((s) =>
@@ -78,7 +185,38 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
       )
     );
   };
-
+  const removeSection = (sectionId) => {
+    setSections((prev) => {
+      const newSections = prev.filter((s) => s.id !== sectionId);
+      if (newSections.length === 0) {
+        return [
+          {
+            id: Date.now(),
+            title: "Section Title",
+            description: "Section Description",
+            image: null,
+            expanded: true,
+            items: [],
+          },
+        ];
+      }
+      return newSections;
+    });
+  };
+  const addSection = () => {
+    const newId = Date.now();
+    setSections((prev) => [
+      ...prev,
+      {
+        id: newId,
+        title: "New Section Title",
+        description: "New Section Description",
+        image: null,
+        expanded: true,
+        items: [],
+      },
+    ]);
+  };
   const updateItem = (sectionId, itemId, field, value) => {
     setSections((prev) =>
       prev.map((s) => {
@@ -94,7 +232,19 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
       })
     );
   };
-
+  const removeItem = (sectionId, itemId) => {
+    setSections((prev) =>
+      prev.map((s) => {
+        if (s.id === sectionId) {
+          return {
+            ...s,
+            items: s.items.filter((i) => i.id !== itemId),
+          };
+        }
+        return s;
+      })
+    );
+  };
   const handleSectionImageChange = (sectionId, e) => {
     const file = e.target.files[0];
     if (file) {
@@ -102,15 +252,14 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
       updateSection(sectionId, "image", url);
     }
   };
-
   const handleItemImageChange = (sectionId, itemId, e) => {
     const file = e.target.files[0];
     if (file) {
       const url = URL.createObjectURL(file);
       updateItem(sectionId, itemId, "image", url);
+      updateItem(sectionId, itemId, "file", file);
     }
   };
-
   const addItemToSection = (sectionId) => {
     const newId = Date.now();
     setSections((prev) =>
@@ -126,7 +275,9 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
                   desc: "Item Description",
                   price: 0.0,
                   calories: 0,
+                  ingredients: "",
                   image: null,
+                  file: null,
                 },
               ],
             }
@@ -134,7 +285,69 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
       )
     );
   };
-
+  const autoGenerate = () => {
+    const numSections = Math.floor(Math.random() * 3) + 2; // 2-4 sections
+    const newSections = [];
+    const seed = Date.now(); // Use timestamp for varied randomness across clicks
+    // Simple seeded random for reproducibility in variation but different per click
+    const seededRandom = (seedValue) => {
+      let s = seedValue || seed;
+      return () => {
+        s = (s * 16807) % 2147483647;
+        return s / 2147483647;
+      };
+    };
+    for (let i = 0; i < numSections; i++) {
+      const rand = seededRandom(seed + i);
+      const title =
+        dummySectionTitles[Math.floor(rand() * dummySectionTitles.length)];
+      const desc =
+        dummySectionDescriptions[
+          Math.floor(rand() * dummySectionDescriptions.length)
+        ];
+      const sectionImage = dummyImages[Math.floor(rand() * dummyImages.length)];
+      const numItems = Math.floor(Math.random() * 3) + 2; // 2-4 items per section
+      const items = [];
+      for (let j = 0; j < numItems; j++) {
+        const itemRand = seededRandom(seed + i * 10 + j);
+        const name =
+          dummyItemNames[Math.floor(itemRand() * dummyItemNames.length)];
+        const d =
+          dummyItemDescriptions[
+            Math.floor(itemRand() * dummyItemDescriptions.length)
+          ];
+        const ing =
+          dummyIngredients[Math.floor(itemRand() * dummyIngredients.length)];
+        const price = (Math.floor(itemRand() * 46) + 5).toFixed(2); // 5-50
+        const cal = Math.floor(itemRand() * 901) + 100; // 100-1000
+        const itemImage =
+          dummyImages[Math.floor(itemRand() * dummyImages.length)];
+        items.push({
+          id: Date.now() + j + i * 100,
+          name,
+          desc: d,
+          price: parseFloat(price),
+          calories: cal,
+          ingredients: ing,
+          image: itemImage,
+          file: null,
+        });
+      }
+      newSections.push({
+        id: Date.now() + i,
+        title,
+        description: desc,
+        image: sectionImage,
+        expanded: true,
+        items,
+      });
+    }
+    setSections(newSections);
+    toast.push({
+      message: "Menu auto-generated with fresh ideas!",
+      type: "success",
+    });
+  };
   const createCategoryIfNeeded = async (title, description) => {
     try {
       const res = await fetch(
@@ -163,7 +376,23 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
       throw err;
     }
   };
-
+  const fetchMyItems = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/menus/me`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const result = await res.json();
+      if (result.success) {
+        return result.items;
+      }
+    } catch (err) {
+      console.error("Error fetching menu items:", err);
+    }
+    return [];
+  };
   const handleNext = async () => {
     const allItems = sections.flatMap((section) =>
       section.items.map((item) => ({
@@ -172,28 +401,41 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
         short_description: item.desc,
         price: item.price.toString(),
         calories: item.calories.toString(),
-        ingredients: "",
-        images: [], // Skip images for now
+        ingredients: item.ingredients || "",
+        localImage: item.image,
       }))
     );
-
     if (allItems.length === 0) {
       toast.push({ message: "Please add at least one item", type: "error" });
       return;
     }
-
     setLoading(true);
+    const createdItems = [];
     try {
       if (selectedCategory) {
         // Use selected category for all items
         for (const itemData of allItems) {
+          let imagesToUpload = [];
+          if (itemData.localImage && typeof itemData.localImage === "string") {
+            try {
+              const response = await fetch(itemData.localImage);
+              if (!response.ok) throw new Error("Failed to fetch image");
+              const blob = await response.blob();
+              const filename = `auto-generated-${Date.now()}.jpg`;
+              const file = new File([blob], filename, { type: "image/jpeg" });
+              imagesToUpload = [file];
+            } catch (err) {
+              console.error("Failed to fetch dummy image:", err);
+            }
+          }
+
           const data = new FormData();
           Object.keys(itemData).forEach((key) => {
-            if (itemData[key]) {
+            if (key !== "localImage" && itemData[key]) {
               data.append(key, itemData[key]);
             }
           });
-
+          imagesToUpload.forEach((imgFile) => data.append("images", imgFile));
           const res = await fetch(
             `${import.meta.env.VITE_API_BASE_URL}/api/menus`,
             {
@@ -202,9 +444,13 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
               body: data,
             }
           );
-
           const result = await res.json();
-          if (!result.success) {
+          if (result.success) {
+            createdItems.push({
+              ...result.menuItem,
+              localImage: itemData.localImage,
+            });
+          } else {
             throw new Error(result.message || "Failed to create menu item");
           }
         }
@@ -217,22 +463,40 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
               section.description
             );
             for (const item of section.items) {
+              let imagesToUpload = [];
+              if (item.image && typeof item.image === "string") {
+                try {
+                  const response = await fetch(item.image);
+                  if (!response.ok) throw new Error("Failed to fetch image");
+                  const blob = await response.blob();
+                  const filename = `auto-generated-${Date.now()}.jpg`;
+                  const file = new File([blob], filename, {
+                    type: "image/jpeg",
+                  });
+                  imagesToUpload = [file];
+                } catch (err) {
+                  console.error("Failed to fetch dummy image:", err);
+                }
+              }
+
               const itemData = {
                 category: catId,
                 item_name: item.name,
                 short_description: item.desc,
                 price: item.price.toString(),
                 calories: item.calories.toString(),
-                ingredients: "",
-                images: [],
+                ingredients: item.ingredients || "",
+                localImage: item.image,
               };
               const data = new FormData();
               Object.keys(itemData).forEach((key) => {
-                if (itemData[key]) {
+                if (key !== "localImage" && itemData[key]) {
                   data.append(key, itemData[key]);
                 }
               });
-
+              imagesToUpload.forEach((imgFile) =>
+                data.append("images", imgFile)
+              );
               const res = await fetch(
                 `${import.meta.env.VITE_API_BASE_URL}/api/menus`,
                 {
@@ -241,24 +505,32 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
                   body: data,
                 }
               );
-
               const result = await res.json();
-              if (!result.success) {
+              if (result.success) {
+                createdItems.push({
+                  ...result.menuItem,
+                  localImage: itemData.localImage,
+                });
+              } else {
                 throw new Error(result.message || "Failed to create menu item");
               }
             }
           }
         }
       }
-
+      setAllMenuItemsForPreview(createdItems);
       toast.push({
         message: "Menu items created successfully!",
         type: "success",
       });
-
-      // Refresh and navigate
+      // Show preview modal
+      setPreviewModalOpen(true);
+      // Refresh and navigate after modal closes
       refreshMenus && refreshMenus();
-      navigate("/", { replace: true });
+      setTimeout(() => {
+        setPreviewModalOpen(false);
+        navigate("/", { replace: true });
+      }, 3000); // Close after 3 seconds
     } catch (err) {
       console.error(err);
       toast.push({
@@ -269,19 +541,16 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
       setLoading(false);
     }
   };
-
   // Existing handlers...
   const handleInputChange = (e) => {
     setMenuForm((s) => ({ ...s, [e.target.name]: e.target.value }));
   };
-
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files).slice(0, 5);
     setImages(files);
     const previews = files.map((file) => URL.createObjectURL(file));
     setImagePreviews(previews);
   };
-
   const resetForm = () => {
     setMenuForm({
       category: "",
@@ -294,24 +563,18 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
     setImages([]);
     setImagePreviews([]);
   };
-
   const handleSubmitMenu = async (e) => {
     e.preventDefault();
-
     if (!token) {
       toast.push({ message: "Please login first", type: "error" });
       return;
     }
-
     setLoading(true);
     const data = new FormData();
-
     Object.keys(menuForm).forEach((key) => {
       if (menuForm[key]) data.append(key, menuForm[key]);
     });
-
     images.forEach((img) => data.append("images", img));
-
     try {
       const res = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/api/menus`,
@@ -321,20 +584,15 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
           body: data,
         }
       );
-
       const result = await res.json();
-
       if (result.success) {
         toast.push({
           message: "Menu item created successfully",
           type: "success",
         });
-
         resetForm();
         setOpenAddMenu(false);
-
         refreshMenus && refreshMenus();
-
         navigate("/", { replace: true });
       } else {
         toast.push({
@@ -349,75 +607,65 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     if (!token) {
       navigate("/login");
       return;
     }
-
-    const fetchMyItems = async () => {
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/menus/me`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
+    const initFetch = async () => {
+      const fetchedItems = await fetchMyItems();
+      setItems(fetchedItems);
+      const fetchCart = async () => {
+        try {
+          const res = await fetch(
+            `${import.meta.env.VITE_API_BASE_URL}/api/cart`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          const result = await res.json();
+          if (result.success) {
+            setCartIds(result.cart.items.map((i) => i.menuItem._id));
           }
-        );
-        const result = await res.json();
-        if (result.success) {
-          setItems(result.items);
+        } catch (err) {
+          console.error("Error fetching cart:", err);
+        } finally {
+          setLoading(false);
         }
-      } catch (err) {
-        console.error("Error fetching menu items:", err);
-      }
+      };
+      fetchCart();
     };
-
-    const fetchCart = async () => {
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/cart`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        const result = await res.json();
-        if (result.success) {
-          setCartIds(result.cart.items.map((i) => i.menuItem._id));
-        }
-      } catch (err) {
-        console.error("Error fetching cart:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    Promise.all([fetchMyItems(), fetchCart()]);
+    initFetch();
   }, [token, navigate]);
-
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await fetch(
           `${import.meta.env.VITE_API_BASE_URL}/api/category`
         );
-
         const data = await res.json();
-
         if (data.success) {
           setAllCategories(data.categories);
           if (data.categories.length > 0) {
             setSelectedCategory(data.categories[0]._id);
+            setSelectedCategoryName(data.categories[0].name);
           }
         }
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
-
     fetchCategories();
   }, []);
-
+  // Update category name when selection changes
+  useEffect(() => {
+    if (selectedCategory) {
+      const cat = allCategories.find((c) => c._id === selectedCategory);
+      setSelectedCategoryName(cat ? cat.name : "");
+    } else {
+      setSelectedCategoryName("");
+    }
+  }, [selectedCategory, allCategories]);
   const handleDeleteConfirm = async () => {
     if (!selectedDeleteId) return;
     try {
@@ -440,12 +688,10 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
       console.error("Error deleting item:", err);
     }
   };
-
   const handleDelete = (id) => {
     setSelectedDeleteId(id);
     setShowDeleteConfirm(true);
   };
-
   const toggleCart = async (menuId, item) => {
     const inCart = cartIds.includes(menuId);
     try {
@@ -482,21 +728,38 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
       console.error("Error toggling cart:", err);
     }
   };
-
+  // Dynamic current time for mobile UI
+  const [currentTime, setCurrentTime] = useState(
+    new Date().toLocaleTimeString("en-US", {
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  );
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(
+        new Date().toLocaleTimeString("en-US", {
+          hour12: false,
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      );
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
   const isCategorySelected = !!selectedCategory;
-
   if (loading) {
     return <Loading />;
   }
-
   return (
     <>
       <div className="flex lg:flex-row flex-col min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
         {/* Left Side - Editor */}
-        <div className="p-6 mx-auto w-[70%]">
+        <div className="p-6 mx-auto lg:w-[70%] w-full">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Hello Ahbab Zaman! Let’s create your menu
+              Hello {user?.name || user?.email}! Let’s create your menu
             </h1>
             <p className="text-gray-600 text-sm">
               Bring your menu to life. Define your sections and items with
@@ -516,7 +779,10 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
                   <option>English</option>
                 </select>
               </div>
-              <button className="flex items-center gap-1 text-purple-600 hover:text-purple-700 text-sm font-medium transition-colors">
+              <button
+                onClick={autoGenerate}
+                className="flex items-center gap-1 text-purple-600 hover:text-purple-700 text-sm font-medium transition-colors cursor-pointer"
+              >
                 <img
                   src="https://media.finedinemenu.com/filters:strip_exif()/filters:format(webp)/14x14/JTMY8AYcI/a348c6d2-6ecd-4264-99de-1c396c4b6012.png"
                   alt="Auto Generate"
@@ -553,7 +819,7 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
                 <div key={section.id}>
                   {/* Section Header */}
                   <div
-                    className="flex items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                    className="flex items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors relative"
                     onClick={() => toggleSection(section.id)}
                     role="button"
                     tabIndex={0}
@@ -566,7 +832,15 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
                     <div className="flex items-center gap-2 flex-1 min-w-0">
                       <label className="flex-shrink-0">
                         <div className="w-12 h-12 border-2 border-dashed border-gray-300 bg-gray-50 rounded flex items-center justify-center cursor-pointer hover:border-purple-400 transition-colors">
-                          <Upload className="w-4 h-4 text-purple-600" />
+                          {section.image ? (
+                            <img
+                              src={section.image}
+                              alt="Section"
+                              className="w-full h-full object-cover rounded"
+                            />
+                          ) : (
+                            <Upload className="w-4 h-4 text-purple-600" />
+                          )}
                           <input
                             type="file"
                             accept="image/png,image/jpg,image/jpeg"
@@ -612,6 +886,17 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
                         />
                       </div>
                     </div>
+                    {sections.length > 1 && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeSection(section.id);
+                        }}
+                        className="p-1 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors ml-2"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    )}
                   </div>
                   {/* Section Content */}
                   {section.expanded && (
@@ -619,9 +904,15 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
                       {section.items.map((item) => (
                         <div
                           key={item.id}
-                          className="flex flex-col gap-2 p-3 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+                          className="flex flex-col gap-2 p-3 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative"
                         >
-                          <div className="flex items-start gap-2">
+                          <button
+                            onClick={() => removeItem(section.id, item.id)}
+                            className="absolute top-2 right-2 p-1 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors opacity-0 group-hover:opacity-100 z-10"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                          <div className="flex items-start gap-2 group">
                             <label className="flex-shrink-0">
                               <div className="w-12 h-12 border-2 border-dashed border-gray-300 bg-gray-50 rounded flex items-center justify-center cursor-pointer hover:border-purple-400 transition-colors">
                                 {item.image ? (
@@ -675,6 +966,20 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
                                 }
                                 className="border-0 bg-transparent text-sm text-gray-500 w-full focus:outline-none"
                                 placeholder="Item Description"
+                              />
+                              <textarea
+                                value={item.ingredients}
+                                onChange={(e) =>
+                                  updateItem(
+                                    section.id,
+                                    item.id,
+                                    "ingredients",
+                                    e.target.value
+                                  )
+                                }
+                                className="border-0 bg-transparent text-sm text-gray-500 w-full focus:outline-none resize-none"
+                                placeholder="Ingredients (comma-separated)"
+                                rows={2}
                               />
                             </div>
                           </div>
@@ -740,6 +1045,15 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
                 </div>
               ))}
             </div>
+            <div className="mt-4 flex justify-center">
+              <button
+                onClick={addSection}
+                className="flex items-center gap-2 text-purple-600 hover:text-purple-700 text-sm font-medium"
+              >
+                <Plus className="w-4 h-4" />
+                Add Section
+              </button>
+            </div>
             <div className="flex justify-end mt-6 pt-4 border-t border-gray-200">
               <button
                 onClick={handleNext}
@@ -754,23 +1068,18 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
             </div>
           </div>
         </div>
-
         {/* Right Side - Preview */}
-        <div className="flex-shrink-0 w-[30%] p-4">
-          <div
-            className="bg-white rounded-t-3xl border border-gray-300 shadow-lg overflow-hidden"
-            
-          >
+        <div className="flex-shrink-0 lg:w-[30%] w-full p-4">
+          <div className="bg-white rounded-t-3xl rounded-b-3xl border border-gray-300 shadow-lg overflow-hidden">
             {/* Phone Header */}
             <div className="bg-purple-500 text-white h-10 flex items-center justify-between px-3 sticky top-0 z-10">
-              <span className="text-xs font-mono">02:31</span>
+              <span className="text-xs font-mono">{currentTime}</span>
               <div className="flex items-center gap-1">
                 <Signal className="w-3.5 h-3.5" />
                 <Wifi className="w-4 h-4" />
                 <Battery className="w-5 h-5" />
               </div>
             </div>
-
             {/* App Content */}
             <div
               className="overflow-y-auto"
@@ -782,12 +1091,10 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
                 <span className="text-white text-xs font-bold">zaman</span>
                 <Menu className="w-5 h-5 text-white" />
               </div>
-
               {/* Page Title */}
               <div className="flex items-center justify-center bg-white py-7 px-5">
                 <span className="text-gray-900 text-base font-bold">Menu</span>
               </div>
-
               {/* Search Bar */}
               <div className="flex items-center px-3.5 gap-3.5 bg-white">
                 <div className="flex-1 flex items-center px-2.5 py-1.5 border border-purple-900/10 rounded-full">
@@ -796,7 +1103,14 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
                 </div>
                 <MessageCircle className="w-5 h-5 text-gray-900" />
               </div>
-
+              {/* Category Header if selected */}
+              {isCategorySelected && (
+                <div className="px-3.5 py-2 bg-purple-50 border-b border-purple-100">
+                  <h3 className="text-sm font-bold text-purple-800">
+                    {selectedCategoryName}
+                  </h3>
+                </div>
+              )}
               {/* Section Tabs */}
               <div className="flex px-3.5 py-3.5 gap-1.5 overflow-x-auto bg-white">
                 {sections.map((section, index) => (
@@ -812,7 +1126,6 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
                   </div>
                 ))}
               </div>
-
               {/* Sections Content */}
               <div className="space-y-3.5 px-0">
                 {sections.map((section) => (
@@ -836,7 +1149,6 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
                         </svg>
                       )}
                     </div>
-
                     {/* Section Title & Description */}
                     <div className="text-center space-y-1">
                       <h3 className="text-base font-bold text-gray-900">
@@ -846,7 +1158,6 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
                         {section.description}
                       </p>
                     </div>
-
                     {/* Items */}
                     {section.items.map((item) => (
                       <div
@@ -877,6 +1188,9 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
                               {item.name}
                             </h4>
                             <p className="text-sm text-gray-600">{item.desc}</p>
+                            <p className="text-xs text-gray-500">
+                              {item.ingredients || "No ingredients listed"}
+                            </p>
                             <p className="text-sm font-semibold text-purple-600">
                               ৳{item.price.toFixed(2)}
                             </p>
@@ -891,7 +1205,133 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
           </div>
         </div>
       </div>
-
+      {/* Preview Modal - Exact Mobile Device */}
+      {previewModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 animate-fade-in">
+          <div className="relative w-full max-w-[400px] h-[90vh] max-h-[700px] bg-black rounded-3xl shadow-2xl overflow-hidden animate-bounceIn mx-auto">
+            {/* Phone Bezel */}
+            <div className="absolute inset-0 border-8 border-gray-800 rounded-3xl"></div>
+            {/* Phone Notch */}
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-20 h-6 bg-black rounded-b-3xl z-20 mt-[-12px]"></div>
+            {/* Screen Content */}
+            <div className="relative z-10 w-full h-full bg-white overflow-hidden">
+              {/* Phone Header */}
+              <div className="bg-purple-500 text-white h-10 flex items-center justify-between px-3 sticky top-0 z-10">
+                <span className="text-xs font-mono">{currentTime}</span>
+                <div className="flex items-center gap-1">
+                  <Signal className="w-3.5 h-3.5" />
+                  <Wifi className="w-4 h-4" />
+                  <Battery className="w-5 h-5" />
+                </div>
+              </div>
+              {/* App Content */}
+              <div
+                className="overflow-y-auto"
+                style={{ height: "calc(100% - 40px)" }}
+              >
+                {/* App Header */}
+                <div className="bg-purple-500 px-3.5 py-2.5 flex items-center justify-between">
+                  <div className="w-5 h-5 bg-transparent"></div>
+                  <span className="text-white text-xs font-bold">zaman</span>
+                  <Menu className="w-5 h-5 text-white" />
+                </div>
+                {/* Page Title */}
+                <div className="flex items-center justify-center bg-white py-7 px-5">
+                  <span className="text-gray-900 text-base font-bold">
+                    Menu
+                  </span>
+                </div>
+                {/* Search Bar */}
+                <div className="flex items-center px-3.5 gap-3.5 bg-white">
+                  <div className="flex-1 flex items-center px-2.5 py-1.5 border border-purple-900/10 rounded-full">
+                    <Search className="w-4 h-4 text-purple-900/50 mr-2" />
+                    <span className="text-purple-900/50 text-xs">Search</span>
+                  </div>
+                  <MessageCircle className="w-5 h-5 text-gray-900" />
+                </div>
+                {/* Category Header if selected */}
+                {isCategorySelected && (
+                  <div className="px-3.5 py-2 bg-purple-50 border-b border-purple-100">
+                    <h3 className="text-sm font-bold text-purple-800">
+                      {selectedCategoryName}
+                    </h3>
+                  </div>
+                )}
+                {/* Menu Items List */}
+                <div className="py-4 space-y-4 px-4">
+                  {allMenuItemsForPreview.length > 0 ? (
+                    allMenuItemsForPreview.map((item) => (
+                      <div
+                        key={item._id}
+                        className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden animate-fadeIn"
+                      >
+                        <div className="flex items-start p-4 gap-4">
+                          {/* Left Content Section */}
+                          <div className="flex-1 space-y-2 min-w-0">
+                            <h3 className="text-base font-semibold text-gray-900 leading-tight line-clamp-2">
+                              {item.item_name}
+                            </h3>
+                            <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">
+                              {item.short_description}
+                            </p>
+                            {item.ingredients && (
+                              <p className="text-xs text-gray-500">
+                                Ingredients: {item.ingredients}
+                              </p>
+                            )}
+                            <div className="text-lg font-semibold text-purple-600">
+                              ৳{item.price}
+                            </div>
+                            <div className="flex gap-2">
+                              {item.isVegetarian && (
+                                <div
+                                  className="flex items-center justify-center w-6 h-6 bg-white rounded-full border-2 border-gray-300"
+                                  title="Vegetarian"
+                                >
+                                  <span className="text-sm">🌾</span>
+                                </div>
+                              )}
+                              {item.isVegan && (
+                                <div
+                                  className="flex items-center justify-center w-6 h-6 bg-white rounded-full border-2 border-gray-300"
+                                  title="Vegan"
+                                >
+                                  <span className="text-sm">🌿</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          {/* Right Image Section */}
+                          <div className="relative flex-shrink-0 w-20 h-20">
+                            <img
+                              src={
+                                item.images?.length > 0
+                                  ? `${
+                                      import.meta.env.VITE_API_BASE_URL
+                                    }/uploads/${item.images[0]}`
+                                  : item.localImage || PLACEHOLDER_IMAGE
+                              }
+                              alt={item.item_name}
+                              className="w-full h-full object-cover rounded"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="inline-flex items-center justify-center w-12 h-12 bg-gray-100 rounded-full mb-3 mx-auto">
+                        <span className="text-2xl">🍽️</span>
+                      </div>
+                      <p className="text-gray-600 text-sm">No menu items yet</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Existing Modals */}
       <EditMenuModal
         open={editOpen}
@@ -900,7 +1340,6 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
         token={token}
         onUpdated={() => window.location.reload()}
       />
-
       <SingleMenuModal
         open={viewOpen}
         onClose={() => setViewOpen(false)}
@@ -908,7 +1347,6 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
         inCart={!!selectedItem && cartIds.includes(selectedItem._id)}
         toggleCart={toggleCart}
       />
-
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-fade-in">
           <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4 animate-slide-up max-h-[90vh] overflow-y-auto">
@@ -953,13 +1391,11 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
           </div>
         </div>
       )}
-
       <AddCategoryModal
         open={openAddCategory}
         onClose={() => setOpenAddCategory(false)}
         onCategoryAdded={refreshCategories}
       />
-
       {openAddMenu && (
         <div
           className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-70 animate-fadeIn"
@@ -1117,7 +1553,6 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
           </div>
         </div>
       )}
-
       <style jsx>{`
         @keyframes slide-up {
           from {
@@ -1151,6 +1586,9 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
             opacity: 1;
           }
         }
+        .animate-fadeIn {
+          animation: fadeIn 0.25s ease-out;
+        }
         @keyframes scaleUp {
           from {
             transform: scale(0.9);
@@ -1160,9 +1598,6 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
             transform: scale(1);
             opacity: 1;
           }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.25s ease-out;
         }
         .animate-scaleUp {
           animation: scaleUp 0.3s ease-out;
@@ -1180,9 +1615,40 @@ const MyMenu = ({ categories = [], refreshCategories, refreshMenus }) => {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background-color: rgba(0, 0, 0, 0.35);
         }
+        @keyframes bounceIn {
+          0% {
+            transform: scale(0.3);
+            opacity: 0;
+          }
+          50% {
+            transform: scale(1.05);
+          }
+          70% {
+            transform: scale(0.9);
+          }
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+        .animate-bounceIn {
+          animation: bounceIn 0.6s ease-out;
+        }
+        @media (max-width: 768px) {
+          .relative.w-full.max-w-\[280px\].h-\[80vh\].max-h-\[620px\] {
+            width: 100%;
+            height: 80vh;
+            max-width: none;
+          }
+        }
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
       `}</style>
     </>
   );
 };
-
 export default MyMenu;
