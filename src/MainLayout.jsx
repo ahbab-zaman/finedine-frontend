@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import { ToastProvider } from "./components/ToastProvider";
 
 const MainLayout = () => {
@@ -23,7 +24,7 @@ const MainLayout = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-white text-[#575962] select-none">
+    <div className="min-h-screen text-[#575962] select-none">
       {/* Navbar */}
       <Navbar hidden={navbarHidden} />
 
@@ -39,6 +40,9 @@ const MainLayout = () => {
           <Outlet />
         </ToastProvider>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
