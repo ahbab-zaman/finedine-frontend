@@ -2,7 +2,10 @@ import { useLocation } from "react-router-dom";
 
 const Footer = () => {
   const location = useLocation();
-  const isFooter = location.pathname === "/profile" || "/add-review" || "/my-menu";
+
+  const footerPaths = ["/profile", "/add-review", "/my-menu"];
+  const isFooter = footerPaths.includes(location.pathname);
+
   return (
     <div className={`py-8 ${isFooter ? "bg-[#F1F6FE]" : "bg-white"}`}>
       <div className="flex items-center justify-center py-6 lg:hidden"></div>
