@@ -3,11 +3,9 @@ import { useLocation } from "react-router-dom";
 const Footer = () => {
   const location = useLocation();
 
-  const footerPaths = ["/profile", "/add-review", "/my-menu"];
-  const isFooter = footerPaths.includes(location.pathname);
-
+  const isHome = location.pathname === "/";
   return (
-    <div className={`py-8 ${isFooter ? "bg-[#F1F6FE]" : "bg-white"}`}>
+    <div className={`py-8 ${isHome ? "bg-[#F1F6FE]" : "bg-white"}`}>
       <div className="flex items-center justify-center py-6 lg:hidden"></div>
       <div className="w-full flex items-center justify-center space-x-1.5">
         <span className="text-sm font-semibold text-gray-400 order-first">
